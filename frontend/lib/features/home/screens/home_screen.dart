@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../../translate/screens/translate_screen.dart';
+import '../../sign/ui.dart';
 import '../../history/screens/history_screen.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../saved/screens/saved_screen.dart';
@@ -28,7 +28,7 @@ class _SignBridgeHomeState extends State<SignBridgeHome>
 
   final List<Widget> _screens = const [
     _HomeTab(),
-    TranslateScreen(),   
+    SignToSpeechScreen(),
     _SLPPlaceholder(),  
     HistoryScreen(),
   ];

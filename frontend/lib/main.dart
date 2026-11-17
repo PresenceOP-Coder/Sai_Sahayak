@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_bridge/features/auth/providers/auth_provider.dart';
+import 'package:sign_bridge/features/translate/providers/translation_provider.dart';
 import 'package:sign_bridge/features/splash/screens/splash_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => TranslationProvider()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(390, 844),
