@@ -170,14 +170,14 @@ class _BlindPathNavigatorScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF101418),
+      backgroundColor: const Color(0xFFF5F7FF),
 
       appBar: AppBar(
-        backgroundColor: const Color(0xFF101418),
+        backgroundColor: const Color(0xFF1E2158),
         foregroundColor: Colors.white,
 
         title: const Text(
-          'Blind Path Navigator',
+          'Sahayak Navigator',
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),

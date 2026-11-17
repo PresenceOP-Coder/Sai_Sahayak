@@ -83,7 +83,7 @@ class _AppGuideModalState extends State<AppGuideModal> {
           ),
           
           const Text(
-            'How to use SignBridge',
+            'How to use Sahayak',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,

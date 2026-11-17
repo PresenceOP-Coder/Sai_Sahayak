@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>SignBridge uses the camera to translate sign language and detect currency notes.</string>
+	<string>Sahayak uses the camera to translate sign language and detect currency notes.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>SignBridge uses the photo library to pick images of currency notes for detection.</string>
+	<string>Sahayak uses the photo library to pick images of currency notes for detection.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>SignBridge</string>
+	<string>Sahayak</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,7 +17,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>SignBridge</string>
+	<string>Sahayak</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

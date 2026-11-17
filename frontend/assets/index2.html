@@ -3,54 +3,459 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blind Path Navigator</title>
+  <title>Sahayak Path Navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    :root {
+      --bg-page: #F5F7FF;
+      --primary: #1E2158;
+      --accent: #4B6CF7;
+      --accent-light: #EEF2FF;
+      --success: #00E676;
+      --success-dark: #0F6E56;
+      --success-bg: #E6FAF3;
+      --card-bg: #FFFFFF;
+      --text-main: #1E2158;
+      --text-muted: #64748B;
+      --text-sub: #94A3B8;
+      --danger: #EF4444;
+      --border-color: rgba(75, 108, 247, 0.08);
+      --shadow-sm: 0 4px 12px rgba(30, 33, 88, 0.05);
+      --shadow-md: 0 8px 24px rgba(30, 33, 88, 0.08);
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      margin: 0; padding: 20px; background: #101418; color: #f3f4f6;
-      font-family: Arial, sans-serif; text-align: center;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 14px 28px;
     }
-    h1 { margin: 8px 0; font-size: 25px; }
-    #status { color: #cbd5e1; margin: 12px 0 18px; min-height: 22px; }
+
+    .container {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* --- App Header Card --- */
+    .app-header {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 4px 10px rgba(75, 108, 247, 0.25);
+    }
+
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Status Pill */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      transition: all 0.25s ease;
+    }
+
+    .status-badge.active {
+      background: var(--success-bg);
+      color: var(--success-dark);
+    }
+
+    .status-badge.active .status-dot {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.7; }
+    }
+
+    /* --- Status Text Bar --- */
+    #status {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 0 8px;
+      min-height: 18px;
+      font-weight: 500;
+    }
+
+    /* --- Viewfinder Camera Box --- */
     #cameraBox {
-      position: relative; width: min(100%, 900px); margin: 0 auto;
-      background: #000; overflow: hidden; border-radius: 12px;
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      max-height: 380px;
+      background: #0B0E1E;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      border: 2px solid rgba(75, 108, 247, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    video { display: block; width: 100%; height: auto; }
-    canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Viewfinder Corner Overlays */
+    .viewfinder-corners {
+      position: absolute;
+      inset: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--accent);
+      opacity: 0.75;
+    }
+
+    .corner.top-left { top: 0; left: 0; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
+    .corner.top-right { top: 0; right: 0; border-left: none; border-bottom: none; border-top-right-radius: 8px; }
+    .corner.bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; border-bottom-left-radius: 8px; }
+    .corner.bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; border-bottom-right-radius: 8px; }
+
+    /* Idle camera placeholder */
+    .camera-placeholder {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.6);
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .camera-placeholder svg {
+      width: 44px;
+      height: 44px;
+      opacity: 0.7;
+    }
+
+    .camera-placeholder span {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* --- Action Controls --- */
+    .actions-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
     button {
-      margin: 8px; padding: 13px 20px; border: 0; border-radius: 8px;
-      background: #2563eb; color: white; font-size: 16px; cursor: pointer;
+      flex: 1;
+      padding: 15px 20px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    #stopBtn { background: #b91c1c; }
+
+    button svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+    }
+
+    #startBtn {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #FFFFFF;
+      box-shadow: 0 4px 16px rgba(75, 108, 247, 0.35);
+    }
+
+    #startBtn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(75, 108, 247, 0.45);
+    }
+
+    #startBtn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    #stopBtn {
+      background: #FFFFFF;
+      color: var(--danger);
+      border: 1.5px solid rgba(239, 68, 68, 0.3);
+      box-shadow: var(--shadow-sm);
+    }
+
+    #stopBtn:hover:not(:disabled) {
+      background: #FEF2F2;
+      border-color: var(--danger);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* --- Detection Guidance Card --- */
+    .guidance-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .guidance-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .guidance-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .guidance-title svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--accent);
+    }
+
+    .guidance-chip {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--success-dark);
+    }
+
     #log {
-      width: min(100%, 900px); margin: 16px auto; padding: 12px;
-      background: #1f2937; border-radius: 8px; text-align: left;
-      min-height: 50px; line-height: 1.5;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary);
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      line-height: 1.35;
+      word-break: break-word;
     }
-    .hint { color: #9ca3af; font-size: 13px; max-width: 900px; margin: 12px auto; }
+
+    /* --- Hint Warning Footer --- */
+    .hint {
+      background: rgba(75, 108, 247, 0.05);
+      border: 1px dashed rgba(75, 108, 247, 0.25);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .hint-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      margin-top: 1px;
+      stroke: var(--accent);
+    }
   </style>
 </head>
 <body>
-  <h1>Blind Path Navigator</h1>
-  <div id="status">Press Start. Allow camera access when Chrome asks.</div>
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14h-2v-2h2zm0-4h-2V7h2z"/></svg>
+        </div>
+        <div>
+          <div class="brand-title">Sahayak Navigator</div>
+          <div class="brand-subtitle">AI Obstacle & Path Detection</div>
+        </div>
+      </div>
+      <div id="statusBadge" class="status-badge">
+        <div class="status-dot"></div>
+        <span id="badgeText">Standby</span>
+      </div>
+    </header>
 
-  <div id="cameraBox">
-    <video id="video" autoplay muted playsinline></video>
-    <canvas id="overlay"></canvas>
-  </div>
+    <!-- Subtitle Status -->
+    <div id="status">Press "Start Camera" to begin obstacle guidance.</div>
 
-  <div>
-    <button id="startBtn">Start camera</button>
-    <button id="stopBtn" disabled>Stop</button>
-  </div>
+    <!-- Viewfinder -->
+    <div id="cameraBox">
+      <video id="video" autoplay muted playsinline></video>
+      <canvas id="overlay"></canvas>
 
-  <div id="log">Detection messages will appear here.</div>
-  <div class="hint">
-    Demo only. It detects common COCO objects and estimates left/center/right from image position.
-    It does not measure real distance, detect every obstacle, or guarantee a safe path.
-    Do not use it as the sole aid for walking or crossing roads.
+      <div class="viewfinder-corners">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+      </div>
+
+      <div id="cameraPlaceholder" class="camera-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+          <circle cx="12" cy="13" r="4"></circle>
+        </svg>
+        <span>Camera Inactive</span>
+      </div>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="actions-row">
+      <button id="startBtn">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>
+        </svg>
+        Start Camera
+      </button>
+      <button id="stopBtn" disabled>
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6" y="6" width="12" height="12" fill="currentColor"></rect>
+        </svg>
+        Stop
+      </button>
+    </div>
+
+    <!-- Live Guidance Card -->
+    <div class="guidance-card">
+      <div class="guidance-header">
+        <div class="guidance-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          Real-time Audio Guidance
+        </div>
+        <span class="guidance-chip">AI Active</span>
+      </div>
+      <div id="log">Detection messages will appear here.</div>
+    </div>
+
+    <!-- Safety Hint -->
+    <div class="hint">
+      <svg class="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <div>
+        <strong>Assistive Aid:</strong> Estimates obstacle positions (ahead, left, right). Always exercise personal caution when walking or crossing roads.
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -66,6 +471,9 @@
     const canvas = document.getElementById("overlay");
     const ctx = canvas.getContext("2d");
     const statusEl = document.getElementById("status");
+    const statusBadge = document.getElementById("statusBadge");
+    const badgeText = document.getElementById("badgeText");
+    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
     const logEl = document.getElementById("log");
     const startBtn = document.getElementById("startBtn");
     const stopBtn = document.getElementById("stopBtn");
@@ -81,13 +489,20 @@
     const SPEECH_COOLDOWN_MS = 2800;
     const CONFIDENCE_THRESHOLD = 0.45;
 
-    function setStatus(message) {
+    function setStatus(message, isActive = false) {
       statusEl.textContent = message;
+      if (isActive) {
+        statusBadge.classList.add("active");
+        badgeText.textContent = "Scanning";
+      } else {
+        statusBadge.classList.remove("active");
+        badgeText.textContent = "Standby";
+      }
     }
 
     async function loadDetector() {
       if (detector) return;
-      setStatus("Loading object detection model (first load may take a moment)...");
+      setStatus("Loading AI vision model (first load may take a moment)...");
       const vision = await FilesetResolver.forVisionTasks(WASM_URL);
       detector = await ObjectDetector.createFromOptions(vision, {
         baseOptions: { modelAssetPath: MODEL_URL },
@@ -105,7 +520,6 @@
     }
 
     function speakDetection(label, zone, boxArea, frameArea) {
-      // Only announce relatively prominent detections to reduce constant chatter.
       if (boxArea / frameArea < 0.018) return;
 
       const key = `${label}:${zone}`;
@@ -119,13 +533,13 @@
         ? `${label} ahead`
         : `${label} on your ${zone}`;
 
-      // 1. Call Flutter native TTS bridge if running inside Flutter WebView
+      // Call Flutter TTS bridge if in WebView
       if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
         window.flutter_inappwebview.callHandler('speakDetection', message);
         return;
       }
 
-      // 2. Fallback to Web SpeechSynthesis for desktop browsers
+      // Browser fallback speech
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(message);
@@ -160,26 +574,34 @@
         const zone = getZone(x + w / 2, width);
         const percent = Math.round(category.score * 100);
 
-        ctx.strokeStyle = "#00e676";
-        ctx.lineWidth = Math.max(2, width / 320);
+        // Modern glowing rounded bounding box
+        ctx.strokeStyle = "#00E676";
+        ctx.lineWidth = Math.max(3, width / 240);
+        ctx.shadowColor = "rgba(0, 230, 118, 0.6)";
+        ctx.shadowBlur = 8;
         ctx.strokeRect(x, y, w, h);
+        ctx.shadowBlur = 0; // reset
 
-        const text = `${label} ${percent}%`;
-        ctx.font = `${Math.max(14, width / 55)}px Arial`;
+        // Label pill
+        const iconPrefix = zone === "left" ? "⬅️ " : zone === "right" ? "➡️ " : "⬆️ ";
+        const text = `${iconPrefix}${label} (${percent}%)`;
+        ctx.font = `600 ${Math.max(13, width / 45)}px 'Plus Jakarta Sans', sans-serif`;
         const textWidth = ctx.measureText(text).width;
-        const textHeight = Math.max(22, width / 35);
-        ctx.fillStyle = "#00a152";
-        ctx.fillRect(x, Math.max(0, y - textHeight), textWidth + 10, textHeight);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(text, x + 5, Math.max(15, y - 6));
+        const textHeight = Math.max(22, width / 28);
+        
+        ctx.fillStyle = "#0F6E56";
+        ctx.fillRect(x, Math.max(0, y - textHeight - 2), textWidth + 14, textHeight + 2);
+        
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillText(text, x + 7, Math.max(16, y - 7));
 
-        messages.push(`${label} (${zone}, ${percent}%)`);
+        messages.push(`${iconPrefix}${label} (${zone})`);
         speakDetection(label, zone, w * h, frameArea);
       }
 
       const currentLog = messages.length
-        ? messages.slice(0, 5).join(" • ")
-        : "No objects detected";
+        ? messages.slice(0, 3).join("  •  ")
+        : "Clear path ahead. Keep moving forward.";
       if (currentLog !== lastLog) {
         logEl.textContent = currentLog;
         lastLog = currentLog;
@@ -198,7 +620,7 @@
           drawDetections(result);
         } catch (error) {
           console.error("Detection error:", error);
-          setStatus("Detection error. Check the browser console.");
+          setStatus("Detection paused: processing error.");
         }
       }
       requestAnimationFrame(detectionLoop);
@@ -209,7 +631,7 @@
       try {
         await loadDetector();
 
-        setStatus("Requesting camera access...");
+        setStatus("Accessing camera stream...");
         stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
           video: {
@@ -222,15 +644,16 @@
         video.srcObject = stream;
         await video.play();
 
+        cameraPlaceholder.style.display = "none";
         running = true;
         lastFrameTime = 0;
         lastSpoken.clear();
         stopBtn.disabled = false;
-        setStatus("Running. Keep the camera pointed ahead.");
+        setStatus("Live navigation active. Point phone ahead.", true);
         detectionLoop();
       } catch (error) {
         console.error(error);
-        setStatus(`Could not start: ${error.message || error}`);
+        setStatus(`Camera error: ${error.message || error}`);
         startBtn.disabled = false;
         if (stream) {
           stream.getTracks().forEach(track => track.stop());
@@ -246,11 +669,12 @@
         stream = null;
       }
       video.srcObject = null;
+      cameraPlaceholder.style.display = "flex";
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      setStatus("Stopped.");
+      setStatus("Navigator stopped.", false);
       logEl.textContent = "Detection messages will appear here.";
       lastLog = "";
     }

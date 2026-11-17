@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen>
       await auth.initialization;
       if (auth.isLoggedIn && mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const SignBridgeHome()),
+          MaterialPageRoute(builder: (_) => const SahayakHome()),
         );
       }
     });
@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen>
     if (!mounted) return;
     if (success) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const SignBridgeHome()),
+        MaterialPageRoute(builder: (_) => const SahayakHome()),
       );
     }
   }
@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           const SizedBox(width: 12),
                           const Text(
-                            'SignBridge',
+                            'Sahayak',
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
@@ -449,7 +449,7 @@ class _LoginScreenState extends State<LoginScreen>
                           onPressed: () =>
                               Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
-                                builder: (_) => const SignBridgeHome()),
+                                builder: (_) => const SahayakHome()),
                           ),
                           child: Text(
                             'Continue as Guest',

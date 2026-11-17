@@ -25,7 +25,7 @@ class _CurrencyDetectorScreenState extends State<CurrencyDetectorScreen> {
   bool _autoSpeak = true;
   String _statusMessage = 'Initializing ONNX Runtime...';
 
-  // Theme constants matching SignBridge design
+  // Theme constants matching Sahayak design
   static const Color primaryColor = Color(0xFF1E2158);
   static const Color accentColor = Color(0xFF4B6CF7);
   static const Color pageBg = Color(0xFFF5F7FF);

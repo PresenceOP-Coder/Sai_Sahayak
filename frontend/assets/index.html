@@ -93,8 +93,8 @@
     let currentGesture = null;
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       const lm = results.multiHandLandmarks[0];
-      drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });
-      drawLandmarks(ctx, lm, { color: '#FF0000', lineWidth: 2 });
+      drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#00E676', lineWidth: 4 });
+      drawLandmarks(ctx, lm, { color: '#4B6CF7', fillColor: '#FFFFFF', lineWidth: 2, radius: 4 });
       currentGesture = classify(lm);
     }
     ctx.restore();

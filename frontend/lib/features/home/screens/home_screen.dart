@@ -11,14 +11,17 @@ import '../widgets/app_guide_modal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-class SignBridgeHome extends StatefulWidget {
-  const SignBridgeHome({super.key});
+class SahayakHome extends StatefulWidget {
+  const SahayakHome({super.key});
 
   @override
-  State<SignBridgeHome> createState() => _SignBridgeHomeState();
+  State<SahayakHome> createState() => _SahayakHomeState();
 }
 
-class _SignBridgeHomeState extends State<SignBridgeHome>
+// Retained as alias for backward compatibility
+typedef SignBridgeHome = SahayakHome;
+
+class _SahayakHomeState extends State<SahayakHome>
     with TickerProviderStateMixin {
   int _selectedIndex = 0;
   late AnimationController _fadeCtrl;
@@ -211,7 +214,7 @@ class _HomeTab extends StatelessWidget {
                   _HeroBanner(
                     onGetStarted: () {
                       final home = context
-                          .findAncestorStateOfType<_SignBridgeHomeState>();
+                          .findAncestorStateOfType<_SahayakHomeState>();
                       home?._onNavTap(1);
                     },
                   ),
@@ -224,12 +227,12 @@ class _HomeTab extends StatelessWidget {
                   _ModeGrid(
                     onSLT: () {
                       final home = context
-                          .findAncestorStateOfType<_SignBridgeHomeState>();
+                          .findAncestorStateOfType<_SahayakHomeState>();
                       home?._onNavTap(1);
                     },
                     onSLP: () {
                       final home = context
-                          .findAncestorStateOfType<_SignBridgeHomeState>();
+                          .findAncestorStateOfType<_SahayakHomeState>();
                       home?._onNavTap(2);
                     },
                   ),
@@ -264,7 +267,7 @@ class _HomeTab extends StatelessWidget {
                     },
                     onHistory: () {
                       final home = context
-                          .findAncestorStateOfType<_SignBridgeHomeState>();
+                          .findAncestorStateOfType<_SahayakHomeState>();
                       home?._onNavTap(3);
                     },
                     onSaved: () {
@@ -361,7 +364,7 @@ class _AppHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   const Text(
-                    'SignBridge',
+                    'Sahayak',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -504,7 +507,7 @@ class _HeroBanner extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Sign Language\nBridge System',
+                'Sahayak\nAssistive AI System',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -978,7 +981,7 @@ class _SupportCard extends StatelessWidget {
         icon: Icons.info_outline_rounded,
         iconBg: const Color(0xFFF1EFE8),
         iconColor: const Color(0xFF5F5E5A),
-        title: 'About SignBridge',
+        title: 'About Sahayak',
         subtitle: 'Version 1.0.0 · Built with ❤️',
         onTap: () {},
       ),
