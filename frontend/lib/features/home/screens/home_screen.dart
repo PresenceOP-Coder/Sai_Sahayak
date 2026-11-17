@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../sign/ui.dart';
+import '../../object/ui.dart';
 import '../../history/screens/history_screen.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../saved/screens/saved_screen.dart';
@@ -32,7 +33,7 @@ class _SahayakHomeState extends State<SahayakHome>
   final List<Widget> _screens = const [
     _HomeTab(),
     SignToSpeechScreen(),
-    _SLPPlaceholder(),  
+    BlindPathNavigatorScreen(),  
     HistoryScreen(),
   ];
 
@@ -119,7 +120,7 @@ class _BottomNav extends StatelessWidget {
             children: [
               _navItem(0, Icons.home_outlined, Icons.home, 'Home'),
               _navItem(1, Icons.camera_alt_outlined, Icons.camera_alt, 'SLT'),
-              _navItem(2, Icons.keyboard_outlined, Icons.keyboard, 'SLP'),
+              _navItem(2, Icons.visibility_outlined, Icons.visibility, 'Navigator'),
               _navItem(3, Icons.history_outlined, Icons.history, 'History'),
             ],
           ),
@@ -577,14 +578,14 @@ class _ModeGrid extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: _ModeCard(
-            icon: Icons.keyboard_rounded,
+            icon: Icons.visibility_rounded,
             iconBg: const Color(0xFFEEF2FF),
             iconColor: const Color(0xFF4B6CF7),
-            title: 'SLP',
-            subtitle: 'Text → Sign',
+            title: 'Navigator',
+            subtitle: 'Object & Path',
             description:
-                'Type text and watch it converted to sign language poses.',
-            chipLabel: 'Produce',
+                'Real-time obstacle detection & spoken voice navigation.',
+            chipLabel: 'Explore',
             chipBg: const Color(0xFFEEF2FF),
             chipColor: const Color(0xFF4B6CF7),
             onTap: onSLP,
