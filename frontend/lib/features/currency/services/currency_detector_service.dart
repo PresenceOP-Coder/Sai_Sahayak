@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_onnxruntime/flutter_onnxruntime.dart';
 import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 import '../models/currency_detection.dart';
 
 class CurrencyDetectorService {
@@ -74,8 +74,14 @@ class CurrencyDetectorService {
     return detectFromImage(image, minConfidence: minConfidence);
   }
 
-  /// Run currency detection on a file from Camera or Gallery.
-  Future<CurrencyDetection?> detectFromFile(File file, {double minConfidence = 0.30}) async {
+  /// Run currency detection on an XFile or any file object with readAsBytes() (Web & Native compatible).
+  Future<CurrencyDetection?> detectFromFile(dynamic file, {double minConfidence = 0.30}) async {
+    final Uint8List bytes = await file.readAsBytes();
+    return detectFromBytes(bytes, minConfidence: minConfidence);
+  }
+
+  /// Run currency detection on an XFile (works on Web, Mobile, and Desktop).
+  Future<CurrencyDetection?> detectFromXFile(XFile file, {double minConfidence = 0.30}) async {
     final bytes = await file.readAsBytes();
     return detectFromBytes(bytes, minConfidence: minConfidence);
   }
