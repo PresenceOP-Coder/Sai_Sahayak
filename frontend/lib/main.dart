@@ -8,7 +8,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (_) {
+    try {
+      await dotenv.load(fileName: "assets/.env");
+    } catch (_) {
+      // Ignored: AppConfig provides fallback constants if .env is missing or blocked by asset packaging.
+    }
+  }
   runApp(const MyApp());
 }
 

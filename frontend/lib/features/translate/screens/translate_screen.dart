@@ -59,8 +59,12 @@ class _TranslateScreenState extends State<TranslateScreen>
     _setupWebSocket();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final token = context.read<AuthProvider>().token ?? '';
-      _wsService.connect(token);
+      final auth = context.read<AuthProvider>();
+      if (!auth.isLoggedIn || (auth.token == null || auth.token!.isEmpty)) {
+        setState(() => _statusMessage = 'Please log in to connect to the translation server.');
+        return;
+      }
+      _wsService.connect(auth.token!);
     });
   }
 

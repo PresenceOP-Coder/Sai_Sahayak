@@ -21,14 +21,23 @@ JPEG_QUALITY = 80
 
 class ISLModelAPI:
     def __init__(self, top_k: int = 5):
+        # Check if Hugging Face Space ID is provided (e.g. "Honored-One/SAI_SIGN_LANG_MODEL")
+        hf_space_id = os.getenv("HF_SPACE_ID")
+        default_url = (
+            f"https://{hf_space_id.lower().replace('/', '-').replace('_', '-')}.hf.space"
+            if hf_space_id
+            else "http://127.0.0.1:7860"
+        )
+        default_type = "gradio" if hf_space_id else "fastapi"
+
         self.base_url = os.getenv(
             "MODEL_API_URL",
-            os.getenv("BASE_URL", "http://127.0.0.1:7860"),
+            os.getenv("BASE_URL", default_url),
         ).rstrip("/")
         if not self.base_url.startswith(("http://", "https://")):
             self.base_url = f"http://{self.base_url}"
 
-        self.api_type = os.getenv("MODEL_API_TYPE", "fastapi").lower()
+        self.api_type = os.getenv("MODEL_API_TYPE", default_type).lower()
         self.predict_frames_bin_url  = f"{self.base_url}/predict_frames_bin"
         self.predict_video_url       = f"{self.base_url}/predict"
         self.health_url              = f"{self.base_url}/health"
@@ -44,6 +53,9 @@ class ISLModelAPI:
 
         # Persistent connection pool — avoids TCP handshake on every request
         self.session = requests.Session()
+        hf_token = os.getenv("HF_TOKEN")
+        if hf_token:
+            self.session.headers.update({"Authorization": f"Bearer {hf_token}"})
         adapter = requests.adapters.HTTPAdapter(
             pool_connections=2,
             pool_maxsize=4,

@@ -21,14 +21,23 @@ ASGI WebSockets + slowapi.
 """
 from datetime import datetime
 import os
+import sys
+from pathlib import Path
 import logging
 import threading
 import concurrent.futures
 from contextlib import asynccontextmanager
 
+# Ensure backend directory is in sys.path so 'import app...' works when executed directly
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from dotenv import load_dotenv
 
-load_dotenv()
+# Try loading both .env and env
+load_dotenv(_BACKEND_DIR / ".env")
+load_dotenv(_BACKEND_DIR / "env")
 
 from fastapi import FastAPI, Request, Header, Depends
 from fastapi import Cookie, WebSocket, WebSocketException,WebSocketDisconnect, status

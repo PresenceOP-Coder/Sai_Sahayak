@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import '../config/app_config.dart';
 
 class ApiService {
-  static String get baseUrl => dotenv.env['API_BASE_URL']!;
+  static String get baseUrl => AppConfig.apiBaseUrl;
 
   // Authentication
 

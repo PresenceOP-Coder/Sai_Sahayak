@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
+import '../config/app_config.dart';
 
 typedef OnTranslationCallback = void Function(
   String label,
@@ -45,7 +45,7 @@ class TransportNotImplementedException implements Exception {
 }
 
 class WebSocketService {
-  static String get wsUrl => dotenv.env['SLT_WS_URL']!;
+  static String get wsUrl => AppConfig.sltWsUrl;
 
   WebSocketChannel? _channel;
   bool _isConnected = false;
