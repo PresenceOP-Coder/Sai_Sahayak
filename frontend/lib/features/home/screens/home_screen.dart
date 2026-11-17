@@ -3,14 +3,9 @@ import 'package:provider/provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../sign/ui.dart';
 import '../../object/ui.dart';
-import '../../history/screens/history_screen.dart';
-import '../../auth/screens/login_screen.dart';
-import '../../saved/screens/saved_screen.dart';
-import '../../settings/screens/settings_screen.dart';
 import '../../currency/screens/currency_detector_screen.dart';
-import '../widgets/app_guide_modal.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../settings/screens/settings_screen.dart';
+import '../../auth/screens/login_screen.dart';
 
 class SahayakHome extends StatefulWidget {
   const SahayakHome({super.key});
@@ -33,8 +28,8 @@ class _SahayakHomeState extends State<SahayakHome>
   final List<Widget> _screens = const [
     _HomeTab(),
     SignToSpeechScreen(),
-    BlindPathNavigatorScreen(),  
-    HistoryScreen(),
+    BlindPathNavigatorScreen(),
+    CurrencyDetectorScreen(),
   ];
 
   @override
@@ -44,21 +39,6 @@ class _SahayakHomeState extends State<SahayakHome>
         vsync: this, duration: const Duration(milliseconds: 280));
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeIn);
     _fadeCtrl.forward();
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkFirstTime();
-    });
-  }
-
-  Future<void> _checkFirstTime() async {
-    final prefs = await SharedPreferences.getInstance();
-    final hasSeenGuide = prefs.getBool('has_seen_guide') ?? false;
-    if (!hasSeenGuide) {
-      if (mounted) {
-        showAppGuide(context);
-      }
-      await prefs.setBool('has_seen_guide', true);
-    }
   }
 
   @override
@@ -90,7 +70,6 @@ class _SahayakHomeState extends State<SahayakHome>
   }
 }
 
-
 class _BottomNav extends StatelessWidget {
   const _BottomNav({required this.selectedIndex, required this.onTap});
 
@@ -119,9 +98,9 @@ class _BottomNav extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _navItem(0, Icons.home_outlined, Icons.home, 'Home'),
-              _navItem(1, Icons.camera_alt_outlined, Icons.camera_alt, 'SLT'),
-              _navItem(2, Icons.visibility_outlined, Icons.visibility, 'Navigator'),
-              _navItem(3, Icons.history_outlined, Icons.history, 'History'),
+              _navItem(1, Icons.sign_language_outlined, Icons.sign_language, 'Sign AI'),
+              _navItem(2, Icons.explore_outlined, Icons.explore, 'Navigator'),
+              _navItem(3, Icons.payments_outlined, Icons.payments, 'Currency'),
             ],
           ),
         ),
@@ -137,7 +116,7 @@ class _BottomNav extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(
-            horizontal: isSelected ? 18 : 12, vertical: 10),
+            horizontal: isSelected ? 16 : 10, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
               ? accentColor.withValues(alpha: 0.12)
@@ -169,7 +148,6 @@ class _BottomNav extends StatelessWidget {
     );
   }
 }
-
 
 class _HomeTab extends StatelessWidget {
   const _HomeTab();
@@ -222,16 +200,16 @@ class _HomeTab extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Mode selector: SLT + SLP
-                  const _SectionLabel(label: 'Choose mode'),
+                  // Assistive AI Tools Grid (Sign + Navigator)
+                  const _SectionLabel(label: 'Assistive AI Tools'),
                   const SizedBox(height: 12),
-                  _ModeGrid(
-                    onSLT: () {
+                  _AssistiveToolsGrid(
+                    onSignAI: () {
                       final home = context
                           .findAncestorStateOfType<_SahayakHomeState>();
                       home?._onNavTap(1);
                     },
-                    onSLP: () {
+                    onNavigator: () {
                       final home = context
                           .findAncestorStateOfType<_SahayakHomeState>();
                       home?._onNavTap(2);
@@ -241,15 +219,13 @@ class _HomeTab extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Assistive AI: Currency Detector
-                  const _SectionLabel(label: 'Assistive AI'),
+                  const _SectionLabel(label: 'Offline Currency Detection'),
                   const SizedBox(height: 12),
                   _CurrencyBanner(
                     onOpen: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CurrencyDetectorScreen(),
-                        ),
-                      );
+                      final home = context
+                          .findAncestorStateOfType<_SahayakHomeState>();
+                      home?._onNavTap(3);
                     },
                   ),
 
@@ -259,22 +235,20 @@ class _HomeTab extends StatelessWidget {
                   const _SectionLabel(label: 'Quick actions'),
                   const SizedBox(height: 12),
                   _QuickActions(
-                    onCurrency: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CurrencyDetectorScreen(),
-                        ),
-                      );
+                    onSignAI: () {
+                      final home = context
+                          .findAncestorStateOfType<_SahayakHomeState>();
+                      home?._onNavTap(1);
                     },
-                    onHistory: () {
+                    onNavigator: () {
+                      final home = context
+                          .findAncestorStateOfType<_SahayakHomeState>();
+                      home?._onNavTap(2);
+                    },
+                    onCurrency: () {
                       final home = context
                           .findAncestorStateOfType<_SahayakHomeState>();
                       home?._onNavTap(3);
-                    },
-                    onSaved: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const SavedScreen()),
-                      );
                     },
                     onSettings: () {
                       Navigator.of(context).push(
@@ -285,15 +259,8 @@ class _HomeTab extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Activity stats
-                  const _SectionLabel(label: 'Your activity'),
-                  const SizedBox(height: 12),
-                  const _StatsRow(),
-
-                  const SizedBox(height: 24),
-
-                  // Support section
-                  const _SectionLabel(label: 'Support'),
+                  // About & Features section
+                  const _SectionLabel(label: 'Information & Settings'),
                   const SizedBox(height: 12),
                   const _SupportCard(),
                 ],
@@ -312,7 +279,6 @@ class _HomeTab extends StatelessWidget {
     return 'Good evening 👋';
   }
 }
-
 
 class _AppHeader extends StatelessWidget {
   const _AppHeader({
@@ -353,14 +319,13 @@ class _AppHeader extends StatelessWidget {
               // Brand row + avatar
               Row(
                 children: [
-                  // Brand
                   Container(
                     padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.sign_language,
+                    child: const Icon(Icons.accessibility_new_rounded,
                         color: Colors.white, size: 20),
                   ),
                   const SizedBox(width: 10),
@@ -374,7 +339,6 @@ class _AppHeader extends StatelessWidget {
                   ),
                   const Spacer(),
 
-                  // Avatar / login
                   if (isLoggedIn)
                     PopupMenuButton<String>(
                       onSelected: (v) {
@@ -424,7 +388,6 @@ class _AppHeader extends StatelessWidget {
 
               const SizedBox(height: 14),
 
-              // Greeting
               Text(
                 greeting,
                 style: TextStyle(
@@ -446,7 +409,6 @@ class _AppHeader extends StatelessWidget {
   }
 }
 
-
 class _HeroBanner extends StatelessWidget {
   const _HeroBanner({required this.onGetStarted});
   final VoidCallback onGetStarted;
@@ -466,7 +428,6 @@ class _HeroBanner extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Decorative circles
           Positioned(
             top: -20, right: -20,
             child: Container(
@@ -499,7 +460,7 @@ class _HeroBanner extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
-                  'AI-Powered',
+                  'Assistive AI Suite',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 11,
@@ -508,7 +469,7 @@ class _HeroBanner extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Sahayak\nAssistive AI System',
+                'Sahayak\nSmart Accessibility',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -518,9 +479,9 @@ class _HeroBanner extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Translate signs to text, or convert text back to sign language poses.',
+                'Sign-to-speech translation, obstacle navigation for the visually impaired, and currency detection.',
                 style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withValues(alpha: 0.75),
                     fontSize: 13,
                     height: 1.5),
               ),
@@ -538,7 +499,7 @@ class _HeroBanner extends StatelessWidget {
                 onPressed: onGetStarted,
                 icon: const Icon(Icons.play_arrow_rounded, size: 18),
                 label: const Text(
-                  'Get Started',
+                  'Launch Sign AI',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -550,45 +511,48 @@ class _HeroBanner extends StatelessWidget {
   }
 }
 
+class _AssistiveToolsGrid extends StatelessWidget {
+  const _AssistiveToolsGrid({
+    required this.onSignAI,
+    required this.onNavigator,
+  });
 
-class _ModeGrid extends StatelessWidget {
-  const _ModeGrid({required this.onSLT, required this.onSLP});
-  final VoidCallback onSLT;
-  final VoidCallback onSLP;
+  final VoidCallback onSignAI;
+  final VoidCallback onNavigator;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
-          child: _ModeCard(
-            icon: Icons.camera_alt_rounded,
-            iconBg: const Color(0xFFE6FAF3),
-            iconColor: const Color(0xFF0F6E56),
-            title: 'SLT',
-            subtitle: 'Sign → Text',
+          child: _ToolCard(
+            icon: Icons.sign_language_rounded,
+            iconBg: const Color(0xFFEEF2FF),
+            iconColor: const Color(0xFF4B6CF7),
+            title: 'Sign AI',
+            subtitle: 'Gesture → Voice',
             description:
-                'Point camera at signs and get instant text translation.',
-            chipLabel: 'Translate',
-            chipBg: const Color(0xFFE6FAF3),
-            chipColor: const Color(0xFF0F6E56),
-            onTap: onSLT,
+                'Point camera at hand signs for real-time speech translation.',
+            chipLabel: 'MediaPipe AI',
+            chipBg: const Color(0xFFEEF2FF),
+            chipColor: const Color(0xFF4B6CF7),
+            onTap: onSignAI,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _ModeCard(
-            icon: Icons.visibility_rounded,
-            iconBg: const Color(0xFFEEF2FF),
-            iconColor: const Color(0xFF4B6CF7),
+          child: _ToolCard(
+            icon: Icons.explore_rounded,
+            iconBg: const Color(0xFFFEF3E2),
+            iconColor: const Color(0xFFBA7517),
             title: 'Navigator',
-            subtitle: 'Object & Path',
+            subtitle: 'Path Guidance',
             description:
-                'Real-time obstacle detection & spoken voice navigation.',
-            chipLabel: 'Explore',
-            chipBg: const Color(0xFFEEF2FF),
-            chipColor: const Color(0xFF4B6CF7),
-            onTap: onSLP,
+                'Real-time obstacle detection & spoken guidance for navigation.',
+            chipLabel: 'Vision AI',
+            chipBg: const Color(0xFFFEF3E2),
+            chipColor: const Color(0xFFBA7517),
+            onTap: onNavigator,
           ),
         ),
       ],
@@ -596,8 +560,8 @@ class _ModeGrid extends StatelessWidget {
   }
 }
 
-class _ModeCard extends StatelessWidget {
-  const _ModeCard({
+class _ToolCard extends StatelessWidget {
+  const _ToolCard({
     required this.icon,
     required this.iconBg,
     required this.iconColor,
@@ -685,7 +649,6 @@ class _ModeCard extends StatelessWidget {
     );
   }
 }
-
 
 class _CurrencyBanner extends StatelessWidget {
   const _CurrencyBanner({required this.onOpen});
@@ -782,15 +745,15 @@ class _CurrencyBanner extends StatelessWidget {
 
 class _QuickActions extends StatelessWidget {
   const _QuickActions({
+    required this.onSignAI,
+    required this.onNavigator,
     required this.onCurrency,
-    required this.onHistory,
-    required this.onSaved,
     required this.onSettings,
   });
 
+  final VoidCallback onSignAI;
+  final VoidCallback onNavigator;
   final VoidCallback onCurrency;
-  final VoidCallback onHistory;
-  final VoidCallback onSaved;
   final VoidCallback onSettings;
 
   @override
@@ -799,7 +762,27 @@ class _QuickActions extends StatelessWidget {
       children: [
         Expanded(
           child: _QAButton(
-            icon: Icons.payments_outlined,
+            icon: Icons.sign_language_rounded,
+            iconBg: const Color(0xFFEEF2FF),
+            iconColor: const Color(0xFF4B6CF7),
+            label: 'Sign AI',
+            onTap: onSignAI,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _QAButton(
+            icon: Icons.explore_rounded,
+            iconBg: const Color(0xFFFEF3E2),
+            iconColor: const Color(0xFFBA7517),
+            label: 'Navigator',
+            onTap: onNavigator,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _QAButton(
+            icon: Icons.payments_rounded,
             iconBg: const Color(0xFFE6FAF3),
             iconColor: const Color(0xFF0F6E56),
             label: 'Currency',
@@ -809,27 +792,7 @@ class _QuickActions extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _QAButton(
-            icon: Icons.history_rounded,
-            iconBg: const Color(0xFFFEF3E2),
-            iconColor: const Color(0xFFBA7517),
-            label: 'History',
-            onTap: onHistory,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _QAButton(
-            icon: Icons.bookmark_outline_rounded,
-            iconBg: const Color(0xFFFBEAF0),
-            iconColor: const Color(0xFF993556),
-            label: 'Saved',
-            onTap: onSaved,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _QAButton(
-            icon: Icons.settings_outlined,
+            icon: Icons.settings_rounded,
             iconBg: const Color(0xFFF1EFE8),
             iconColor: const Color(0xFF5F5E5A),
             label: 'Settings',
@@ -894,104 +857,77 @@ class _QAButton extends StatelessWidget {
   }
 }
 
+class _SupportCard extends StatelessWidget {
+  const _SupportCard();
 
-class _StatsRow extends StatelessWidget {
-  const _StatsRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        Expanded(
-            child: _StatCard(value: '142', label: 'Translations\ndone')),
-        SizedBox(width: 10),
-        Expanded(
-            child: _StatCard(value: '38', label: 'Signs\nproduced')),
-        SizedBox(width: 10),
-        Expanded(
-            child: _StatCard(value: '7', label: 'Days\nactive')),
-      ],
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  const _StatCard({required this.value, required this.label});
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEEF2FF),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(value,
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E2158))),
-          const SizedBox(height: 4),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 11,
-                  color: Colors.black54,
-                  height: 1.4)),
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.accessibility_new_rounded, color: Color(0xFF4B6CF7)),
+            SizedBox(width: 10),
+            Text('About Sahayak', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sahayak is an all-in-one assistive AI suite designed to empower deaf, mute, and visually impaired individuals.',
+              style: TextStyle(fontSize: 14, height: 1.4),
+            ),
+            SizedBox(height: 12),
+            Text(
+              '• Sign AI: Real-time sign language translation to voice.\n'
+              '• Navigator: Obstacle detection & path alerts for the blind.\n'
+              '• Currency Detector: Offline Indian Rupee recognition.\n'
+              '• Version: 1.0.0',
+              style: TextStyle(fontSize: 13, color: Colors.black87, height: 1.5),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
   }
-}
 
-
-class _SupportCard extends StatelessWidget {
-  const _SupportCard();
-
-  List<_SupportItem> _buildItems(BuildContext context) {
-    return [
-      _SupportItem(
-        icon: Icons.help_outline_rounded,
-        iconBg: const Color(0xFFEEF2FF),
-        iconColor: const Color(0xFF4B6CF7),
-        title: 'Help & Guide',
-        subtitle: 'How to use SLT and SLP modes',
-        onTap: () => showAppGuide(context),
+  void _showPrivacyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.shield_outlined, color: Color(0xFF0F6E56)),
+            SizedBox(width: 10),
+            Text('Privacy & Offline', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'Your camera frames and audio guidance are processed locally on-device. No live video stream or personal image is sent or saved to external servers, guaranteeing maximum privacy and speed.',
+          style: TextStyle(fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Got it'),
+          ),
+        ],
       ),
-      _SupportItem(
-        icon: Icons.mail_outline_rounded,
-        iconBg: const Color(0xFFE6FAF3),
-        iconColor: const Color(0xFF0F6E56),
-        title: 'Contact Us',
-        subtitle: 'Reach our support team',
-        onTap: () {},
-      ),
-      _SupportItem(
-        icon: Icons.shield_outlined,
-        iconBg: const Color(0xFFFEF3E2),
-        iconColor: const Color(0xFFBA7517),
-        title: 'Privacy & Terms',
-        subtitle: 'Legal info and data usage',
-        onTap: () {},
-      ),
-      _SupportItem(
-        icon: Icons.info_outline_rounded,
-        iconBg: const Color(0xFFF1EFE8),
-        iconColor: const Color(0xFF5F5E5A),
-        title: 'About Sahayak',
-        subtitle: 'Version 1.0.0 · Built with ❤️',
-        onTap: () {},
-      ),
-    ];
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = _buildItems(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1005,87 +941,98 @@ class _SupportCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        children: items.asMap().entries.map((entry) {
-          final isLast = entry.key == items.length - 1;
-          final item = entry.value;
-          return Column(
-            children: [
-              InkWell(
-                onTap: item.onTap,
-                borderRadius: BorderRadius.vertical(
-                  top: entry.key == 0
-                      ? const Radius.circular(16)
-                      : Radius.zero,
-                  bottom: isLast
-                      ? const Radius.circular(16)
-                      : Radius.zero,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36, height: 36,
-                        decoration: BoxDecoration(
-                          color: item.iconBg,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(item.icon,
-                            color: item.iconColor, size: 18),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(item.title,
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1E2158))),
-                            const SizedBox(height: 2),
-                            Text(item.subtitle,
-                                style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black45)),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.chevron_right_rounded,
-                          color: Colors.black26, size: 20),
-                    ],
-                  ),
-                ),
+        children: [
+          _tile(
+            icon: Icons.shield_outlined,
+            iconBg: const Color(0xFFE6FAF3),
+            iconColor: const Color(0xFF0F6E56),
+            title: 'Privacy & Offline AI',
+            subtitle: 'Camera feeds processed locally on-device',
+            onTap: () => _showPrivacyDialog(context),
+            isFirst: true,
+          ),
+          const Divider(height: 1, indent: 66, endIndent: 16),
+          _tile(
+            icon: Icons.settings_outlined,
+            iconBg: const Color(0xFFEEF2FF),
+            iconColor: const Color(0xFF4B6CF7),
+            title: 'Preferences & Settings',
+            subtitle: 'Audio volume, dark mode, language',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
+            },
+          ),
+          const Divider(height: 1, indent: 66, endIndent: 16),
+          _tile(
+            icon: Icons.info_outline_rounded,
+            iconBg: const Color(0xFFF1EFE8),
+            iconColor: const Color(0xFF5F5E5A),
+            title: 'About Sahayak',
+            subtitle: 'Version 1.0.0 · Assistive AI Suite',
+            onTap: () => _showAboutDialog(context),
+            isLast: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tile({
+    required IconData icon,
+    required Color iconBg,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.vertical(
+        top: isFirst ? const Radius.circular(16) : Radius.zero,
+        bottom: isLast ? const Radius.circular(16) : Radius.zero,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(10),
               ),
-              if (!isLast)
-                const Divider(height: 1, indent: 66, endIndent: 16),
-            ],
-          );
-        }).toList(),
+              child: Icon(icon, color: iconColor, size: 18),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1E2158))),
+                  const SizedBox(height: 2),
+                  Text(subtitle,
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black45)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded,
+                color: Colors.black26, size: 20),
+          ],
+        ),
       ),
     );
   }
 }
-
-class _SupportItem {
-  const _SupportItem({
-    required this.icon,
-    required this.iconBg,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final Color iconBg;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-}
-
 
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel({required this.label});
@@ -1100,34 +1047,6 @@ class _SectionLabel extends StatelessWidget {
         fontWeight: FontWeight.w600,
         color: Colors.black45,
         letterSpacing: 0.7,
-      ),
-    );
-  }
-}
-
-
-class _SLPPlaceholder extends StatelessWidget {
-  const _SLPPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.keyboard_rounded, size: 48, color: Color(0xFF4B6CF7)),
-            SizedBox(height: 16),
-            Text('SLP Screen',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E2158))),
-            SizedBox(height: 8),
-            Text('Text → Sign Language Pose',
-                style: TextStyle(color: Colors.black45)),
-          ],
-        ),
       ),
     );
   }
