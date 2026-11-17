@@ -34,6 +34,8 @@ dependencies:
   shared_preferences: ^2.3.2
   image: ^4.10.1
   flutter_dotenv: ^6.0.1
+  flutter_inappwebview: ^6.1.5
+
 
 dev_dependencies:
   camera_platform_interface: ^2.14.0
@@ -47,3 +49,4 @@ flutter:
     - .env
     - assets/.env
     - assets/env.json
+    - assets/index.html
