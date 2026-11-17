@@ -35,7 +35,8 @@ dependencies:
   image: ^4.10.1
   flutter_dotenv: ^6.0.1
   flutter_inappwebview: ^6.1.5
-
+  flutter_onnxruntime: ^1.4.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   camera_platform_interface: ^2.14.0
@@ -47,6 +48,6 @@ flutter:
   uses-material-design: true
   assets:
     - .env
-    - assets/.env
     - assets/env.json
     - assets/index.html
+    - assets/models/best.onnx

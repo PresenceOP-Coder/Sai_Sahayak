@@ -6,6 +6,7 @@ import '../../history/screens/history_screen.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../saved/screens/saved_screen.dart';
 import '../../settings/screens/settings_screen.dart';
+import '../../currency/screens/currency_detector_screen.dart';
 import '../widgets/app_guide_modal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -235,10 +236,32 @@ class _HomeTab extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
+                  // Assistive AI: Currency Detector
+                  const _SectionLabel(label: 'Assistive AI'),
+                  const SizedBox(height: 12),
+                  _CurrencyBanner(
+                    onOpen: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CurrencyDetectorScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
                   // Quick actions
                   const _SectionLabel(label: 'Quick actions'),
                   const SizedBox(height: 12),
                   _QuickActions(
+                    onCurrency: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CurrencyDetectorScreen(),
+                        ),
+                      );
+                    },
                     onHistory: () {
                       final home = context
                           .findAncestorStateOfType<_SignBridgeHomeState>();
@@ -660,13 +683,108 @@ class _ModeCard extends StatelessWidget {
 }
 
 
+class _CurrencyBanner extends StatelessWidget {
+  const _CurrencyBanner({required this.onOpen});
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onOpen,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0F6E56), Color(0xFF00A86B)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F6E56).withValues(alpha: 0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(Icons.payments_rounded,
+                  color: Colors.white, size: 28),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        'Currency Detector',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.25),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'ONNX AI',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Point camera to identify Indian Rupee notes & hear denomination spoken aloud.',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.88),
+                      fontSize: 12,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded,
+                color: Colors.white70, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _QuickActions extends StatelessWidget {
   const _QuickActions({
+    required this.onCurrency,
     required this.onHistory,
     required this.onSaved,
     required this.onSettings,
   });
 
+  final VoidCallback onCurrency;
   final VoidCallback onHistory;
   final VoidCallback onSaved;
   final VoidCallback onSettings;
@@ -677,6 +795,16 @@ class _QuickActions extends StatelessWidget {
       children: [
         Expanded(
           child: _QAButton(
+            icon: Icons.payments_outlined,
+            iconBg: const Color(0xFFE6FAF3),
+            iconColor: const Color(0xFF0F6E56),
+            label: 'Currency',
+            onTap: onCurrency,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _QAButton(
             icon: Icons.history_rounded,
             iconBg: const Color(0xFFFEF3E2),
             iconColor: const Color(0xFFBA7517),
@@ -684,7 +812,7 @@ class _QuickActions extends StatelessWidget {
             onTap: onHistory,
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: _QAButton(
             icon: Icons.bookmark_outline_rounded,
@@ -694,7 +822,7 @@ class _QuickActions extends StatelessWidget {
             onTap: onSaved,
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: _QAButton(
             icon: Icons.settings_outlined,

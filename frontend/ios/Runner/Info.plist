@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>SignBridge uses the camera to translate sign language into text.</string>
+	<string>SignBridge uses the camera to translate sign language and detect currency notes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SignBridge uses the photo library to pick images of currency notes for detection.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
