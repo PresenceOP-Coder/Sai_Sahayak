@@ -1,1285 +1,348 @@
-# signBridge
+# Sahayak (सहायक) — Smart Accessibility & Assistive AI Suite
 
-A real-time **Indian Sign Language (ISL) recognition and translation system** built around a Flutter client, FastAPI backend, WebSocket-based streaming, MediaPipe landmark processing, and a fine-tuned Swin3D-S recognition model.
+A unified, real-time **Assistive AI system** designed to empower deaf, mute, and visually impaired individuals. **Sahayak** brings together on-device **Sign-to-Speech translation**, computer-vision **Blind Path Navigation**, and offline **Indian Rupee Currency Detection** into an accessible, privacy-first Flutter application backed by an optional FastAPI cloud recognition service.
 
-![GitHub Repo stars](https://img.shields.io/github/stars/Uni-Creator/signBridge?style=social)
-![GitHub forks](https://img.shields.io/github/forks/Uni-Creator/signBridge?style=social)
-![Accuracy](https://img.shields.io/badge/Top--1%20Accuracy-66.84%25-blue)
-![Classes](https://img.shields.io/badge/ISL%20Classes-76-green)
-![Backbone](https://img.shields.io/badge/Backbone-Swin3D--S-orange)
-![Backend](https://img.shields.io/badge/Backend-FastAPI-009688)
-![Frontend](https://img.shields.io/badge/Frontend-Flutter-02569B)
+[![GitHub Stars](https://img.shields.io/badge/GitHub-PresenceOP--Coder%2FSai__Sahayak-blue?logo=github)](https://github.com/PresenceOP-Coder/Sai_Sahayak)
+[![Flutter](https://img.shields.io/badge/Frontend-Flutter%203.x-02569B?logo=flutter)](https://flutter.dev)
+[![ONNX Runtime](https://img.shields.io/badge/AI%20Runtime-ONNX%20YOLOv10-005CED?logo=onnx)](https://onnxruntime.ai)
+[![MediaPipe](https://img.shields.io/badge/Computer%20Vision-MediaPipe-FF6F00?logo=google)](https://developers.google.com/mediapipe)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+---
+
+## 📌 Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+  - [1. 🤟 Sign-to-Speech (Sign AI)](#1--sign-to-speech-sign-ai)
+  - [2. 🦯 Blind Path Navigator](#2--blind-path-navigator)
+  - [3. 💵 Offline Indian Rupee Currency Detector](#3--offline-indian-rupee-currency-detector)
+  - [4. 🔒 Privacy-First On-Device Vision](#4--privacy-first-on-device-vision)
+  - [5. 🌐 Extended Cloud Recognition Pipeline (Optional)](#5--extended-cloud-recognition-pipeline-optional)
+- [System Architecture](#system-architecture)
+- [Models & AI Specifications](#models--ai-specifications)
+- [Repository Structure](#repository-structure)
+- [Getting Started](#getting-started)
+  - [Frontend Setup (Flutter)](#frontend-setup-flutter)
+  - [Backend Setup (FastAPI & WebSocket)](#backend-setup-fastapi--websocket)
+- [Testing](#testing)
+  - [Flutter Health & Analysis](#flutter-health--analysis)
+  - [Backend Regression & WebSocket Tests](#backend-regression--websocket-tests)
+- [Configuration & Environment](#configuration--environment)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License & Acknowledgments](#license--acknowledgments)
 
 ---
 
 ## Overview
 
-**signBridge** is a real-time Indian Sign Language system that combines video-based sign recognition with a mobile translation interface.
+**Sahayak** (meaning *Helper* / *Companion*) addresses multiple critical everyday accessibility barriers in a single cohesive platform:
 
-The system consists of:
-
-* A **Flutter mobile application** for camera capture, live translation, sentence construction, and text-to-speech.
-* A **FastAPI backend** providing authentication, history, health monitoring, REST APIs, and WebSocket communication.
-* A **real-time WebSocket processing pipeline** for receiving camera frames and coordinating sign-language processing.
-* **MediaPipe Pose and Hand Landmarker** models for extracting body and hand landmarks.
-* A fine-tuned **Swin3D-S** video recognition model capable of classifying 76 ISL word classes.
-* **Firebase** for authentication and user synchronization.
-* A separate model-serving layer for computationally expensive inference.
-
-The backend is designed so that the mobile client does not need to directly communicate with the model infrastructure.
+1. **For the Deaf & Mute Community**: Bridges the communication gap with hearing individuals by translating hand gestures into spoken voice and live text captions in real time.
+2. **For the Visually Impaired Community**: Provides situational awareness, detecting everyday obstacles and announcing directional path navigation cues through spoken audio.
+3. **For Financial Independence**: Enables visually impaired individuals to identify Indian currency notes instantly without requiring internet connectivity or cloud latency.
 
 ---
 
-# Architecture
+## Key Features
+
+### 1. 🤟 Sign-to-Speech (Sign AI)
+- **Real-Time Hand Landmark Tracking**: Powered by MediaPipe Hands, tracking 21 key landmarks per hand with zero cloud lag.
+- **Dynamic Sign Recognition**: Detects everyday gestures (greetings, responses, emergency phrases) with hold-duration detection and continuous smoothing.
+- **Voice Synthesis**: Automatically announces translations aloud using `flutter_tts` so people nearby can hear what is being signed without reading the screen.
+
+### 2. 🦯 Blind Path Navigator
+- **Live Obstacle Detection**: Identifies nearby obstacles, furniture, people, stairs, and doors using real-time computer vision.
+- **Spatial Audio Guidance**: Translates detected bounding boxes and proximity into clear spoken navigation cues (e.g., *"Obstacle ahead, path clear to your left"*).
+- **Accessible UI**: Designed with high-contrast Material 3 surfaces, audible feedback, and audio-first operation.
+
+### 3. 💵 Offline Indian Rupee Currency Detector
+- **On-Device YOLOv10n Model**: Runs a fine-tuned ONNX model (`assets/models/best.onnx`) directly inside the app using `flutter_onnxruntime`.
+- **7 Denomination Classes**: Detects and classifies **₹5, ₹10, ₹20, ₹50, ₹100, ₹200, and ₹500** notes.
+- **Instant Spoken Readout**: Speaks the denomination and confidence level immediately upon detection (e.g., *"₹500 detected with 96 percent confidence"*).
+- **Zero Internet Requirement**: Operates 100% offline, guaranteeing availability in markets, public transit, and remote areas.
+
+### 4. 🔒 Privacy-First On-Device Vision
+- Camera frames, obstacle bounding boxes, and currency inference passes are computed locally on the user's device.
+- No live video feeds or personal camera streams are uploaded to external cloud servers, guaranteeing absolute privacy and maximum responsiveness.
+
+### 5. 🌐 Extended Cloud Recognition Pipeline (Optional)
+- **Swin3D-S Video Transformer**: Includes a fine-tuned video backbone (pretrained on Kinetics-400) capable of classifying **76 Indian Sign Language (ISL) word classes** with **66.84% Top-1 accuracy**.
+- **FastAPI & WebSocket Streaming**: Low-latency video frame streaming via custom binary `ISLF` JPEG container protocol for high-performance remote server inference.
+- **Firebase Auth**: Secure user authentication and cloud synchronization for account profiles.
+
+---
 
 ## System Architecture
 
 ```mermaid
 flowchart TD
-    A[Flutter Mobile App] -->|HTTPS REST| B[FastAPI Backend]
-    A -->|Authenticated WebSocket| C[WebSocket SLT Endpoint]
-
-    B --> D[Firebase Authentication]
-    B --> E[Translation History]
-    B --> F[Health & Monitoring]
-
-    C --> G[WebSocket Processing Pipeline]
-
-    G --> H[Frame Validation]
-    H --> I[Frame Decoding]
-    I --> J[MediaPipe]
-
-    J --> K[Pose Landmarks]
-    J --> L[Left Hand Landmarks]
-    J --> M[Right Hand Landmarks]
-
-    G --> N[Model API / Inference Layer]
-
-    N --> O[Swin3D-S]
-    O --> P[76 ISL Classes]
-
-    P --> Q[Prediction]
-    Q --> G
-
-    G --> R[Translation Response]
-    R --> A
-```
-
-## Request Flow
-
-```text
-                         ┌──────────────────────┐
-                         │    Flutter Client    │
-                         │                      │
-                         │ Camera / UI / TTS    │
-                         └──────────┬───────────┘
-                                    │
-                         HTTPS / WebSocket
-                                    │
-                                    ▼
-                    ┌────────────────────────────┐
-                    │      FastAPI Backend       │
-                    │                            │
-                    │ Auth / REST / WebSocket    │
-                    └─────────────┬──────────────┘
-                                  │
-                    ┌─────────────┴─────────────┐
-                    │                           │
-                    ▼                           ▼
-          ┌──────────────────┐       ┌──────────────────┐
-          │ Firebase Auth    │       │ Translation DB   │
-          └──────────────────┘       └──────────────────┘
-
-                                  │
-                                  ▼
-                    ┌────────────────────────────┐
-                    │ WebSocket Processing       │
-                    │ Pipeline                   │
-                    └─────────────┬──────────────┘
-                                  │
-                     Frame Processing
-                                  │
-                                  ▼
-                    ┌────────────────────────────┐
-                    │ MediaPipe Landmarkers      │
-                    │                            │
-                    │ Pose + Left Hand + Right   │
-                    └─────────────┬──────────────┘
-                                  │
-                                  ▼
-                    ┌────────────────────────────┐
-                    │ Model / Inference Layer    │
-                    │                            │
-                    │ Swin3D-S / Model API      │
-                    └─────────────┬──────────────┘
-                                  │
-                                  ▼
-                    ┌────────────────────────────┐
-                    │ ISL Prediction             │
-                    │                            │
-                    │ 76 Word Classes            │
-                    └─────────────┬──────────────┘
-                                  │
-                                  ▼
-                         WebSocket Response
-                                  │
-                                  ▼
-                    ┌────────────────────────────┐
-                    │ Flutter Sentence Builder   │
-                    │ + TTS + Translation UI     │
-                    └────────────────────────────┘
-```
-
----
-
-# Demo
-
-https://github.com/user-attachments/assets/130351a1-b1d9-4432-a4a4-7e64ee8ec296
-
----
-
-# Model Results
-
-The current recognition model was evaluated on 76 ISL word classes.
-
-| Metric          |      Value |
-| --------------- | ---------: |
-| Top-1 Accuracy  | **66.84%** |
-| Macro F1        |  **0.638** |
-| Weighted F1     |  **0.648** |
-| ISL Classes     |     **76** |
-| Test Samples    |    **187** |
-| Random Baseline |   **1.3%** |
-
-These results correspond to the Swin3D-S recognition model described below.
-
----
-
-# Recognition Model
-
-## Swin3D-S
-
-The recognition model uses the **Swin3D-S (Video Swin Transformer Small)** architecture.
-
-The backbone is pretrained on **Kinetics-400** and fine-tuned for 76 Indian Sign Language word classes.
-
-```text
-Input Video
-3 × 16 × 224 × 224
-        │
-        ▼
-Patch Embedding
-Conv3D
-96 channels
-        │
-        ▼
-Swin Transformer
-        │
-        ├── Stage 1
-        │   2 blocks
-        │   dim = 96
-        │
-        ├── Stage 2
-        │   2 blocks
-        │   dim = 192
-        │
-        ├── Stage 3
-        │   18 blocks
-        │   dim = 384
-        │
-        └── Stage 4
-            2 blocks
-            dim = 768
-        │
-        ▼
-Adaptive Average Pooling
-        │
-        ▼
-768-dimensional Feature
-        │
-        ▼
-Linear Classification Head
-768 → 76
-        │
-        ▼
-ISL Word Prediction
-```
-
-### Model Statistics
-
-| Property             | Value                     |
-| -------------------- | ------------------------- |
-| Backbone             | Swin3D-S                  |
-| Pretraining          | Kinetics-400              |
-| Total Parameters     | 33,112,492                |
-| Trainable Parameters | 9,510,988                 |
-| Model Size           | ~126 MB                   |
-| Number of Classes    | 76                        |
-| Input                | 16 × 224 × 224 video clip |
-
-### Fine-tuning Strategy
-
-The model uses transfer learning:
-
-* **Frozen**
-
-  * Patch embedding
-  * Stage 1
-  * Stage 2
-
-* **Fine-tuned**
-
-  * Stage 3
-  * Stage 4
-  * Normalization layer
-  * Classification head
-
-Training configuration:
-
-```text
-Loss:
-CrossEntropyLoss
-
-Optimizer:
-AdamW
-
-Learning Rate:
-1e-4
-
-Scheduler:
-ReduceLROnPlateau
-
-Scheduler Factor:
-0.5
-
-Scheduler Patience:
-5
-
-Mixed Precision:
-FP16
-
-Early Stopping:
-Patience = 5
-```
-
----
-
-# Dataset
-
-The recognition model was trained using the Kaggle dataset:
-
-**Indian Sign Language Words with Landmarks**
-
-Dataset:
-
-```text
-https://www.kaggle.com/datasets/kaushikyh/indian-sign-language-words-with-landmarks
-```
-
-## Dataset Split
-
-| Split      |   Samples |
-| ---------- | --------: |
-| Train      |       745 |
-| Validation |       234 |
-| Test       |       187 |
-| **Total**  | **1,166** |
-
-## ISL Classes
-
-The model recognizes 76 ISL word classes:
-
-```text
-afternoon
-animal
-bad
-beautiful
-big
-bird
-blind
-cat
-cheap
-clothing
-cold
-cow
-curved
-deaf
-dog
-dress
-dry
-evening
-expensive
-famous
-fast
-female
-fish
-flat
-friday
-good
-happy
-hat
-healthy
-horse
-hot
-hour
-light
-long
-loose
-loud
-minute
-monday
-month
-morning
-mouse
-narrow
-new
-night
-old
-pant
-pocket
-quiet
-sad
-saturday
-second
-shirt
-shoes
-short
-sick
-skirt
-slow
-small
-suit
-sunday
-t_shirt
-tall
-thursday
-time
-today
-tomorrow
-tuesday
-ugly
-warm
-wednesday
-week
-wet
-wide
-year
-yesterday
-young
-```
-
----
-
-# Video Processing
-
-Input videos are `.MOV` files with variable duration.
-
-The recognition pipeline converts them into fixed-size clips:
-
-```text
-Variable-length video
-        │
-        ▼
-Frame sampling
-        │
-        ▼
-16 frames
-        │
-        ▼
-224 × 224 resize
-        │
-        ▼
-Normalization
-        │
-        ▼
-Swin3D-S
-```
-
-### Preprocessing
-
-* 16-frame temporal clip
-* 224 × 224 spatial resolution
-* Center crop
-* Pixel rescaling
-* Mean/std normalization
-
-### Training Augmentation
-
-Training samples use:
-
-* RandomPerspective
-* ColorJitter
-
----
-
-# Real-Time Translation Pipeline
-
-The current application uses a WebSocket-based real-time communication layer rather than requiring every camera interaction to be handled as an independent HTTP request.
-
-```mermaid
-sequenceDiagram
-    participant App as Flutter App
-    participant API as FastAPI Backend
-    participant WS as WebSocket Pipeline
-    participant MP as MediaPipe
-    participant Model as Model Server
-
-    App->>API: Authenticate
-    API-->>App: JWT
-
-    App->>WS: WebSocket + JWT
-    WS-->>App: Connection Ready
-
-    loop Camera Frames
-        App->>WS: Video frame
-        WS->>WS: Validate / decode frame
-        WS->>MP: Extract landmarks
-        MP-->>WS: Pose + hand landmarks
-        WS->>Model: Inference request
-        Model-->>WS: ISL prediction
-        WS-->>App: Translation response
+    subgraph Client ["Flutter Client (Sahayak Mobile / Web)"]
+        UI[Material 3 Dashboard & Navigation]
+        Cam[Camera Stream / Localhost Server]
+        
+        subgraph OnDeviceAI ["On-Device Edge AI (100% Local & Offline)"]
+            MP[MediaPipe Hand Landmarker]
+            ONNX[ONNX YOLOv10n Currency Model]
+            CVNav[Obstacle Vision & Path Guide]
+            TTS[Flutter Text-to-Speech Engine]
+        end
+        
+        UI --> Cam
+        Cam --> MP
+        Cam --> ONNX
+        Cam --> CVNav
+        MP --> TTS
+        ONNX --> TTS
+        CVNav --> TTS
     end
 
-    App->>App: Sentence building
-    App->>App: Text-to-speech
-```
-
-## Client
-
-The Flutter application is responsible for:
-
-* Camera capture
-* WebSocket communication
-* Authentication
-* Translation UI
-* Prediction display
-* Sentence construction
-* Translation history
-* Text-to-speech
-
-## Backend
-
-The FastAPI backend is responsible for:
-
-* Authentication endpoints
-* Authorization
-* REST APIs
-* WebSocket connections
-* Frame validation
-* Frame decoding
-* Landmark processing
-* Model communication
-* Translation history
-* Health checks
-* Error handling
-* Rate limiting
-
-## Model Layer
-
-The model layer performs the computationally expensive sign recognition operation.
-
-The current recognition model is based on Swin3D-S and predicts one of the 76 trained ISL classes.
-
----
-
-# WebSocket Communication
-
-The backend exposes a WebSocket endpoint for real-time sign-language processing.
-
-The connection is authenticated using a Bearer token rather than placing credentials in the WebSocket URL.
-
-```text
-Authorization: Bearer <JWT>
-```
-
-The WebSocket layer supports binary and encoded frame transport mechanisms.
-
-### Binary JPEG Transport
-
-The project uses an ISLF binary container for batching JPEG frames:
-
-```text
-┌───────────────┬──────────────────┬───────────────┐
-│ Magic "ISLF"  │ Frame Count      │ Frame Lengths │
-│ 4 bytes       │ 2 bytes          │ 4 × N bytes   │
-└───────────────┴──────────────────┴───────────────┘
-                         │
-                         ▼
-                  JPEG Frame Data
-```
-
-This keeps the framing overhead small while allowing multiple compressed JPEG frames to be transported through a single WebSocket message.
-
----
-
-# Authentication
-
-Authentication is handled through **Firebase**.
-
-The backend provides authentication functionality including:
-
-* User registration
-* Login
-* Logout
-* Password reset
-* Password update
-* Authenticated endpoints
-* Token validation
-* Token revocation handling
-
-The WebSocket layer also requires authentication before processing frames.
-
-Credentials and Firebase configuration are not committed to the repository.
-
----
-
-# Translation History
-
-Authenticated users can store and retrieve translation history through the backend.
-
-The history layer supports operations such as:
-
-```text
-Create translation
-        │
-        ▼
-Store history
-        │
-        ├── Get history
-        ├── Delete translation
-        └── Clear history
-```
-
-History operations are protected by authentication and backend authorization.
-
----
-
-# API
-
-The FastAPI backend provides REST and WebSocket interfaces.
-
-## Health
-
-```http
-GET /
-```
-
-Basic service endpoint.
-
-```http
-GET /health
-```
-
-Basic backend health check.
-
-```http
-GET /health/deep
-```
-
-Deep health check for backend dependencies and model infrastructure.
-
-## Authentication
-
-The backend provides authentication routes for:
-
-```text
-Register
-Login
-Logout
-Forgot password
-Update password
-```
-
-## Translation
-
-Real-time translation is handled through the WebSocket layer.
-
-```text
-WebSocket
-/ws/slt
-```
-
-The WebSocket route is responsible for authenticated real-time sign-language processing.
-
-> The exact endpoint paths should be treated as the source of truth from the current FastAPI application and API documentation.
-
----
-
-# Backend Architecture
-
-The backend is organized into separate application layers.
-
-```text
-backend/
-│
-├── app/
-│   ├── config/
-│   │   └── Firebase configuration
-│   │
-│   ├── models/
-│   │   └── Backend data models
-│   │
-│   ├── services/
-│   │   ├── authentication
-│   │   ├── history
-│   │   └── model services
-│   │
-│   ├── websocket/
-│   │   ├── WebSocket handling
-│   │   └── frame processing
-│   │
-│   └── main.py
-│
-├── deployment/
-│   └── Deployment configuration
-│
-├── models/
-│   └── MediaPipe model assets
-│
-├── tests/
-│   ├── regression/
-│   ├── live/
-│   └── e2e/
-│
-├── postman/
-│   └── API collections
-│
-├── docs/
-│   └── Backend documentation
-│
-├── pyproject.toml
-└── uv.lock
+    subgraph Cloud ["Optional Cloud Infrastructure"]
+        API[FastAPI Backend Server]
+        WS[WebSocket SLT Pipeline]
+        FB[Firebase Authentication]
+        Swin[Swin3D-S Recognition Model / Hugging Face]
+        
+        Client -.->|REST Auth| API
+        Client -.->|ISLF Binary Stream| WS
+        API --> FB
+        WS --> Swin
+        Swin -.->|ISL Word Prediction| WS
+        WS -.->|WebSocket Result| Client
+    end
 ```
 
 ---
 
-# Repository Structure
+## Models & AI Specifications
+
+### 1. Currency Detector (YOLOv10n ONNX)
+- **Model File**: `frontend/assets/models/best.onnx`
+- **Architecture**: YOLOv10 Nano optimized for real-time mobile inference
+- **Input Tensor**: `[1, 3, 640, 640]` Planar RGB, normalized $[0.0, 1.0]$
+- **Output Tensor**: `[1, 8400, 11]` (Normalized bounding boxes $[x, y, w, h]$ + 7 class confidence scores)
+- **Supported Classes**:
+  | Class Name | Display | Spoken Announcement |
+  | :--- | :---: | :--- |
+  | `5IndianRupees` | ₹5 | "5 Rupees detected" |
+  | `10IndianRupees` | ₹10 | "10 Rupees detected" |
+  | `20IndianRupees` | ₹20 | "20 Rupees detected" |
+  | `50IndianRupees` | ₹50 | "50 Rupees detected" |
+  | `100IndianRupees` | ₹100 | "100 Rupees detected" |
+  | `200IndianRupees` | ₹200 | "200 Rupees detected" |
+  | `500IndianRupees` | ₹500 | "500 Rupees detected" |
+- **Inference Runtime**: `flutter_onnxruntime` with native hardware acceleration and `onnxruntime-web` WebAssembly fallback.
+
+### 2. ISL Swin3D-S Video Recognition (Cloud Model)
+- **Architecture**: Video Swin Transformer Small (`Swin3D-S`)
+- **Pretraining**: Kinetics-400
+- **Fine-tuned Classes**: 76 Indian Sign Language word classes
+- **Input**: 16-frame temporal video clip ($16 \times 224 \times 224$)
+- **Accuracy**: **66.84% Top-1 Accuracy**, Macro F1: **0.638**, Weighted F1: **0.648**
+- **Hosting**: Hugging Face Spaces (`Creator-090/isl-swin3d-model`)
+
+---
+
+## Repository Structure
 
 ```text
-signBridge/
+Sai_Sahayak/
+├── frontend/                     # Flutter cross-platform client
+│   ├── assets/
+│   │   ├── env.json              # Client environment config
+│   │   ├── index.html            # MediaPipe Hand tracking & Sign AI engine
+│   │   ├── index2.html           # Obstacle detection & path navigator engine
+│   │   └── models/
+│   │       └── best.onnx         # Offline YOLOv10n Indian Rupee ONNX model
+│   ├── lib/
+│   │   ├── core/                 # Config, frame converters, API & WebSocket services
+│   │   ├── features/
+│   │   │   ├── auth/             # Login, register, guest access & auth providers
+│   │   │   ├── currency/         # Currency detector screens, ONNX service & bounding box painters
+│   │   │   ├── home/             # Sahayak dashboard, assistive tool cards & navigation
+│   │   │   ├── object/           # Blind path navigator screen with audio cues
+│   │   │   ├── settings/         # App preferences, TTS rates & offline info
+│   │   │   ├── sign/             # Sign-to-speech camera screen & gesture listeners
+│   │   │   ├── splash/           # Animated brand launch screen
+│   │   │   └── translate/        # Cloud translation providers & models
+│   │   └── main.dart             # App entry point, MultiProvider & theme setup
+│   ├── web/                      # Flutter Web shell & ONNX Runtime Web JS engine
+│   ├── frontend_guide.md         # Detailed Flutter development & build guide
+│   └── pubspec.yaml              # Dependencies and asset declarations
 │
-├── .github/
-│   └── workflows/
-│       ├── backend-tests.yml
-│       └── frontend-tests.yml
-│
-├── backend/
-│   ├── app/
-│   │   ├── config/
-│   │   ├── models/
-│   │   ├── services/
-│   │   ├── websocket/
-│   │   └── main.py
-│   │
-│   ├── deployment/
+├── backend/                      # Optional FastAPI & WebSocket cloud backend
+│   ├── app/                      # FastAPI application routes, configs & services
 │   ├── docs/
-│   ├── models/
-│   ├── postman/
-│   ├── temp/
-│   ├── tests/
-│   │   ├── e2e/
-│   │   ├── live/
-│   │   └── regression/
-│   ├── pyproject.toml
-│   └── uv.lock
+│   │   └── backend_run_guide.md  # Detailed backend execution guide
+│   ├── tests/                    # 150+ regression & WebSocket test suites
+│   ├── pyproject.toml            # Backend dependencies
+│   └── uv.lock                   # Pinned dependency lockfile
 │
-├── frontend/
-│   └── Flutter application
-│
-├── docs/
-│
-└── README.md
+├── docs/                         # Additional technical documentation
+└── README.md                     # Project documentation
 ```
 
 ---
 
-# Technology Stack
+## Getting Started
 
-| Layer                 | Technology                |
-| --------------------- | ------------------------- |
-| Mobile Frontend       | Flutter / Dart            |
-| Backend               | FastAPI                   |
-| ASGI Server           | Uvicorn                   |
-| Real-Time Transport   | WebSocket                 |
-| Authentication        | Firebase                  |
-| Computer Vision       | MediaPipe                 |
-| Recognition Model     | Swin3D-S                  |
-| Deep Learning         | PyTorch                   |
-| Model Pretraining     | Kinetics-400              |
-| Model Hosting         | Hugging Face              |
-| Database / History    | Backend persistence layer |
-| API Testing           | Python unittest           |
-| Dependency Management | uv                        |
-| CI                    | GitHub Actions            |
-| Deployment            | Render / Hugging Face     |
-| Text-to-Speech        | flutter_tts               |
+### Prerequisites
+
+| Component | Minimum Version | Installation Link |
+| :--- | :--- | :--- |
+| **Flutter SDK** | 3.19+ | [Install Flutter](https://docs.flutter.dev/get-started/install) |
+| **Dart SDK** | 3.3+ (bundled with Flutter) | — |
+| **Python** | 3.10 / 3.11 / 3.12 | [Python Downloads](https://www.python.org/downloads/) |
+| **uv** (Recommended) | Latest | [Install uv](https://github.com/astral-sh/uv) |
+| **Platform Tools** | Android Studio / Xcode / Chrome | — |
 
 ---
 
-# Model Hosting
+### Frontend Setup (Flutter)
 
-The trained Swin3D-S model is hosted at:
+1. **Navigate to the frontend directory**:
+   ```bash
+   cd frontend
+   ```
 
-```text
-https://huggingface.co/Creator-090/isl-swin3d-model
-```
+2. **Install Flutter packages**:
+   ```bash
+   flutter pub get
+   ```
 
-The model-serving infrastructure can be separated from the main application backend so that:
+3. **Configure Environment Settings**:
+   The app provides sensible offline defaults out-of-the-box. If connecting to a local or remote backend:
+   - Edit `.env` or `assets/env.json`:
+     ```env
+     API_BASE_URL=http://10.0.2.2:5000       # Android Emulator (or your LAN IP)
+     SLT_WS_URL=ws://10.0.2.2:5000/slt/v1/ws # WebSocket endpoint
+     ```
 
-```text
-Flutter
-   │
-   ▼
-FastAPI Backend
-   │
-   ▼
-Model API
-   │
-   ▼
-Swin3D-S
-```
-
-The separation allows the application layer and inference layer to be deployed independently.
-
-The backend connects to the deployed model API through `MODEL_API_URL`. Set it
-to the Hugging Face Space URL without a trailing slash:
-
-```bash
-export MODEL_API_URL="https://<space-subdomain>.hf.space"
-```
-
-The model API must expose `GET /health` and `POST /predict_frames_bin`.
-
----
-
-# Training
-
-## Training Platform
-
-The recognition model was trained using:
-
-```text
-Platform:
-Kaggle Notebooks
-
-GPU:
-NVIDIA Tesla T4 15 GB
-
-Framework:
-PyTorch 2.10.0 + CUDA 12.8
-
-Pretrained Weights:
-Swin3D_S_Weights.KINETICS400_V1
-```
-
-## Training Configuration
-
-```python
-BATCH_SIZE = 32
-CLIP_LENGTH = 16
-CLIP_SIZE = 224
-EPOCHS = 1000
-LR = 0.0001
-PATIENCE = 5
-SEED = 42
-```
-
-Early stopping limits the effective training duration.
-
-The reported training run took approximately:
-
-```text
-~3.5 minutes / epoch
-~15 effective epochs
-~1 hour total
-```
+4. **Run the Application**:
+   - **On Connected Android / iOS Device or Emulator**:
+     ```bash
+     flutter run
+     ```
+   - **On Web (Chrome)**:
+     ```bash
+     flutter run -d chrome
+     ```
+   - **Build Release APK**:
+     ```bash
+     flutter build apk --release
+     ```
 
 ---
 
-# Local Development
+### Backend Setup (FastAPI & WebSocket)
 
-## Prerequisites
+*(Required only if using the optional cloud Swin3D-S sign recognition or backend history services)*
 
-Install:
+1. **Navigate to the backend directory**:
+   ```bash
+   cd backend
+   ```
 
-* Python 3.12
-* uv
-* Flutter SDK
-* Android Studio or Xcode
-* Firebase configuration
-* Required MediaPipe model assets
+2. **Set up Python Environment & Install Dependencies**:
+   Using `uv` (recommended):
+   ```bash
+   uv sync
+   ```
+   Or using standard `venv` and `pip`:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # On Windows: .\venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
----
+3. **Configure Firebase (Optional for Auth)**:
+   Place your Firebase configuration at `backend/firebase.json` and service-account key at `backend/firebase-admin.json`.
 
-## Backend
-
-Clone the repository:
-
-```bash
-git clone https://github.com/Uni-Creator/signBridge.git
-cd signBridge
-```
-
-Enter the backend:
-
-```bash
-cd backend
-```
-
-Install dependencies:
-
-```bash
-uv sync
-```
-
-If the backend virtual environment is not already active, activate it with:
-
-```bash
-source .venv/bin/activate
-```
-
-Run the FastAPI backend:
-
-```bash
-uv run uvicorn app.main:app \
-    --host 127.0.0.1 \
-    --port 5000
-```
-
-The backend will be available at:
-
-```text
-http://127.0.0.1:5000
-```
-
-Run the backend against the deployed model:
-
-```bash
-MODEL_API_URL="https://<space-subdomain>.hf.space" \
-uv run uvicorn app.main:app \
-    --host 127.0.0.1 \
-    --port 5000
-```
-
-For network access from another device:
-
-```bash
-uv run uvicorn app.main:app \
-    --host 0.0.0.0 \
-    --port 5000
-```
+4. **Start the FastAPI Server**:
+   ```bash
+   uv run uvicorn app.main:app --host 127.0.0.1 --port 5000 --reload
+   ```
+   - REST API: `http://127.0.0.1:5000/`
+   - Interactive Docs: `http://127.0.0.1:5000/docs`
+   - WebSocket SLT: `ws://127.0.0.1:5000/ws`
 
 ---
 
-# Firebase Configuration
+## Testing
 
-Firebase credentials are required for authentication.
-
-The Firebase configuration file is intentionally excluded from version control.
-
-For local development, place the required configuration in the backend according to the backend setup documentation.
-
-Do **not** commit Firebase service-account credentials.
-
-For CI/CD, the Firebase configuration is supplied through GitHub Actions secrets.
-
----
-
-# Flutter Application
-
-Install Flutter dependencies:
-
+### Flutter Health & Analysis
+Verify that all Dart sources, providers, and assets analyze cleanly:
 ```bash
 cd frontend
-flutter pub get
+flutter analyze
 ```
 
-Run the application:
-
-```bash
-flutter run
-```
-
-Start the backend first, then run Flutter from a second terminal. Configure
-the Flutter environment with the backend URLs:
-
-```text
-API_BASE_URL=http://127.0.0.1:5000
-SLT_WS_URL=ws://127.0.0.1:5000/slt/v1/ws
-```
-
-The application communicates with the FastAPI backend for authentication, history, and real-time translation.
-
-Configure the backend URL in the appropriate Flutter service/configuration file.
-
-Example:
-
-```dart
-static const String API_URL = "https://your-backend.example.com";
-```
-
-For local development:
-
-```dart
-static const String API_URL = "http://YOUR_LOCAL_IP:5000";
-```
-
-The mobile device and development machine must be reachable over the same network when using a local backend.
-
----
-
-# Testing
-
-The backend contains separate test suites for different levels of validation.
-
-```text
-tests/
-│
-├── regression/
-│   └── Fast deterministic backend tests
-│
-├── live/
-│   └── Tests against a running backend
-│
-└── e2e/
-    └── End-to-end application flows
-```
-
-## Regression Tests
-
-Run:
-
+### Backend Regression & WebSocket Tests
+Run the deterministic backend unit and regression test suite:
 ```bash
 cd backend
-
-uv run python -m unittest discover \
-    -s tests/regression \
-    -v
+python -m unittest discover -s tests/regression -v
 ```
 
-These tests validate backend behavior without requiring a running production server.
-
-The current regression suite contains **157 tests**.
-
----
-
-# Live Tests
-
-Live tests run against an actual running backend.
-
-Start the server:
-
+Run the end-to-end WebSocket streaming pipeline test:
 ```bash
 cd backend
-
-uv run uvicorn app.main:app \
-    --host 127.0.0.1 \
-    --port 5000
-```
-
-In another terminal:
-
-```bash
-cd backend
-
-export SIGNBRIDGE_RUN_LIVE_TESTS=1
-
-uv run python -m unittest discover \
-    -s tests/live \
-    -v
-```
-
-The live test configuration supports:
-
-```text
-SIGNBRIDGE_RUN_LIVE_TESTS
-SIGNBRIDGE_LIVE_EMAIL
-SIGNBRIDGE_LIVE_PASSWORD
-SIGNBRIDGE_LIVE_BASE_URL
-SIGNBRIDGE_LIVE_WS_URL
-SIGNBRIDGE_LIVE_FRAMES_DIR
-SIGNBRIDGE_LIVE_TIMEOUT
-```
-
-Live tests are intentionally separated from regression tests because they require external services and a running backend.
-
----
-
-# Continuous Integration
-
-GitHub Actions runs the backend test pipeline.
-
-The CI flow is:
-
-```text
-Checkout
-   │
-   ▼
-Python Setup
-   │
-   ▼
-Install uv
-   │
-   ▼
-uv sync --frozen
-   │
-   ▼
-Regression Tests
-   │
-   ▼
-Create Firebase Configuration
-   │
-   ▼
-Start FastAPI
-   │
-   ▼
-Health Check
-   │
-   ▼
-Live Tests
-   │
-   ▼
-Backend Logs
-   │
-   ▼
-Shutdown
-```
-
-This ensures that live tests execute against an actual FastAPI process rather than an unavailable localhost port.
-
----
-
-# Deployment
-
-The backend can be deployed as a standalone FastAPI service.
-
-Production architecture:
-
-```text
-                         Internet
-                            │
-                            ▼
-                   ┌─────────────────┐
-                   │ Flutter Client  │
-                   └────────┬────────┘
-                            │ HTTPS
-                            │ WSS
-                            ▼
-                   ┌─────────────────┐
-                   │ FastAPI Backend │
-                   │                 │
-                   │ REST + WebSocket│
-                   └────────┬────────┘
-                            │
-                 ┌──────────┴──────────┐
-                 │                     │
-                 ▼                     ▼
-          ┌─────────────┐      ┌────────────────┐
-          │ Firebase    │      │ Model Service  │
-          │             │      │                │
-          │ Auth        │      │ Swin3D-S       │
-          └─────────────┘      └────────────────┘
-```
-
-For a public deployment, HTTPS/WSS should be used rather than unencrypted HTTP/WebSocket connections.
-
----
-
-# Health Monitoring
-
-The backend exposes health endpoints for operational monitoring.
-
-## Basic Health
-
-```http
-GET /health
-```
-
-Used by deployment platforms and CI to verify that the application is accepting requests.
-
-## Deep Health
-
-```http
-GET /health/deep
-```
-
-The deep health endpoint checks backend dependencies and model-service availability.
-
-This is useful for distinguishing:
-
-```text
-Backend is running
-```
-
-from:
-
-```text
-Backend is running but a dependency/model service is unavailable
+python tests/test_websockets_api.py
 ```
 
 ---
 
-# Security
+## Configuration & Environment
 
-The system uses several security mechanisms:
-
-* Firebase-based authentication
-* Bearer-token authorization
-* Authenticated WebSocket connections
-* Rate limiting on sensitive endpoints
-* Server-side validation
-* Payload size validation
-* WebSocket transport validation
-* Separation of secrets from source control
-* HTTPS/WSS in production
-
-Authentication tokens should be transmitted through authorization headers rather than query-string parameters.
+| Environment Variable | Description | Default |
+| :--- | :--- | :--- |
+| `API_BASE_URL` | Base HTTP endpoint for auth and backend services | `http://127.0.0.1:5000` |
+| `SLT_WS_URL` | WebSocket streaming endpoint for server-side sign translation | `ws://127.0.0.1:5000/slt/v1/ws` |
+| `MODEL_API_URL` | Remote Hugging Face Space URL hosting the Swin3D-S model | `https://<space-subdomain>.hf.space` |
+| `JWT_TOKEN` | Bearer token for authenticating WebSocket streaming test client | — |
 
 ---
 
-# Performance
+## Troubleshooting
 
-The original model evaluation was performed on an NVIDIA Tesla T4.
-
-Model inference on CPU-based hosting can be significantly slower than GPU inference.
-
-For the earlier HTTP-based deployment configuration, CPU inference on a free Hugging Face Space was approximately:
-
-```text
-~4–6 seconds per video clip
-```
-
-Actual end-to-end latency depends on:
-
-* Device camera
-* Network latency
-* Frame transport
-* Backend processing
-* MediaPipe processing
-* Model inference hardware
-* Model-server availability
-* Queueing and concurrency
+| Issue | Cause | Solution |
+| :--- | :--- | :--- |
+| **`Image.file is not supported on Flutter Web`** | Using file paths instead of raw memory bytes on web | The app uses `Uint8List` and `Image.memory` across all platforms. Ensure you pull the latest `main`. |
+| **`ONNX session load error on Web`** | Missing ONNX Runtime JavaScript engine | Verified included in `web/index.html` via CDN (`ort.min.js`). Ensure internet connectivity on initial web load. |
+| **Camera permission denied** | OS permission not granted | Open Device Settings → Apps → Sahayak → Permissions and grant Camera and Microphone access. |
+| **Android Emulator cannot reach backend** | Connecting to `127.0.0.1` instead of Android loopback | Use `http://10.0.2.2:5000` when running inside the Android emulator. |
+| **Audio / TTS is silent** | Device volume or silent mode enabled | Ensure device media volume is up and silent/vibrate switch is disabled. |
 
 ---
 
-# Project Goals
+## Contributing
 
-The project is designed around three primary goals:
+We welcome contributions to make Sahayak even more accessible and impactful!
 
-### 1. Real-Time Recognition
-
-Process sign-language input continuously rather than requiring users to manually upload individual videos.
-
-### 2. Accessible Mobile Translation
-
-Provide an accessible Flutter interface for users to communicate through ISL recognition.
-
-### 3. Scalable Architecture
-
-Separate:
-
-```text
-Client
-   ↓
-Application Backend
-   ↓
-Real-Time Processing
-   ↓
-Model Infrastructure
-```
-
-so that individual components can be developed, tested, deployed, and scaled independently.
+1. **Fork the Repository**:
+   ```bash
+   git clone https://github.com/PresenceOP-Coder/Sai_Sahayak.git
+   ```
+2. **Create a Feature Branch**:
+   ```bash
+   git checkout -b feature/amazing-accessibility-feature
+   ```
+3. **Commit your changes**:
+   ```bash
+   git commit -m "feat: add regional language TTS announcements"
+   ```
+4. **Push the branch and open a Pull Request**:
+   ```bash
+   git push origin feature/amazing-accessibility-feature
+   ```
 
 ---
 
-# Future Work
+## License & Acknowledgments
 
-Potential areas for continued development include:
-
-* Expanding the ISL vocabulary
-* Improving recognition accuracy
-* Continuous sentence-level translation
-* Better temporal modeling
-* Improved WebSocket streaming efficiency
-* GPU-backed model inference
-* More efficient landmark processing
-* Multilingual output
-* Improved sentence construction
-* Larger and more diverse datasets
-* Signer-independent evaluation
-* Production observability
-* Distributed inference
-* Model versioning and A/B evaluation
-
----
-
-# Contributing
-
-Contributions are welcome.
-
-1. Fork the repository.
-2. Create a feature branch.
-
-```bash
-git checkout -b feature/your-feature
-```
-
-3. Make your changes.
-4. Run the relevant test suites.
-
-```bash
-cd backend
-uv run python -m unittest discover -s tests/regression -v
-```
-
-5. Commit your changes.
-
-```bash
-git commit -m "feat: describe your change"
-```
-
-6. Push the branch.
-
-```bash
-git push origin feature/your-feature
-```
-
-7. Open a Pull Request.
-
----
-
-# License
-
-This project is licensed under the **MIT License**.
-
-See [`LICENSE`](LICENSE) for details.
-
----
-
-# Contributors
-
-<a href="https://github.com/Uni-Creator/signBridge/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Uni-Creator/signBridge" />
-</a>
-
----
-
-# Contact
-
-For questions or inquiries:
-
-**Abhay Singh**
-
-Email: `abhayr24564@gmail.com`
-
----
-
-## Repository
-
-**GitHub:**
-https://github.com/Uni-Creator/signBridge
-
-**Model:**
-https://huggingface.co/Creator-090/isl-swin3d-model
-# Sai_Sahayak
-# Sai_Sahayak
+- **License**: Licensed under the [MIT License](LICENSE).
+- **MediaPipe**: Hand tracking powered by [Google MediaPipe](https://developers.google.com/mediapipe).
+- **ONNX Runtime**: Efficient on-device currency inference powered by [Microsoft ONNX Runtime](https://onnxruntime.ai).
+- **Vision Model**: Swin3D-S recognition trained on the Kaggle Indian Sign Language Words dataset and hosted on Hugging Face Spaces.
