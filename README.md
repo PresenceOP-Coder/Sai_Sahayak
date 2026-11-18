@@ -15,7 +15,7 @@
 
 - [1. Executive Summary](#1-executive-summary)
 - [2. End-to-End System Architecture](#2-end-to-end-system-architecture)
-  - [The "Guest Mode" Flow](#the-guest-mode-flow)
+  - [Application Navigation Flow](#application-navigation-flow)
   - [Edge AI Reality vs Cloud Backend](#edge-ai-reality-vs-cloud-backend)
   - [Architectural Flowchart](#architectural-flowchart)
 - [3. Deep-Dive Feature Breakdown](#3-deep-dive-feature-breakdown)
@@ -29,9 +29,8 @@
 - [6. Verification & Testing](#6-verification--testing)
   - [Frontend Analysis](#frontend-analysis)
   - [Backend Offline Regression & WebSocket Tests](#backend-offline-regression--websocket-tests)
-- [7. Technical Viva Q&A Highlights](#7-technical-viva-qa-highlights)
-- [8. Troubleshooting Guide](#8-troubleshooting-guide)
-- [9. Contributing & License](#9-contributing--license)
+- [7. Troubleshooting Guide](#7-troubleshooting-guide)
+- [8. Contributing & License](#8-contributing--license)
 
 ---
 
@@ -50,15 +49,13 @@ Assistive applications used outdoors, in public markets, or on transit cannot re
 
 ## 2. End-to-End System Architecture
 
-### The "Guest Mode" Flow
-Users can bypass cloud authentication with a single click on **"Continue as Guest"** to launch directly into the offline AI tools:
+### Application Navigation Flow
+The application launches directly into the assistive dashboard, providing immediate access to all on-device vision engines:
 
 ```mermaid
 flowchart TD
     A[Launch App: main.dart] --> B[SplashScreen: splash_screen.dart]
-    B -->|Check Auth Token| C{Is User Logged In?}
-    C -->|Yes| D[SahayakHome Dashboard]
-    C -->|No / Guest| D
+    B --> D[SahayakHome Dashboard]
     
     subgraph SahayakHome [SahayakHome Bottom Navigation]
         D --> Tab0[Tab 0: Home Dashboard]
@@ -144,9 +141,17 @@ graph LR
    - `[1, 1, 1, 1]` + Open Thumb $\rightarrow$ *"Hello! Nice to meet you."* (Open Palm)
    - `[0, 0, 0, 0]` + Closed Thumb $\rightarrow$ *"Yes, I agree."* (Fist)
    - `[0, 0, 0, 0]` + Open Thumb $\rightarrow$ *"Everything is good."* (Thumbs Up)
+   - `[1, 0, 0, 0]` + Closed Thumb $\rightarrow$ *"Excuse me, I need assistance."* (Pointing Up)
+   - `[1, 0, 0, 0]` + Open Thumb $\rightarrow$ *"Wait a moment, please."*
    - `[1, 1, 0, 0]` + Closed Thumb $\rightarrow$ *"Thank you very much."* (Peace / V-sign)
+   - `[1, 1, 0, 0]` + Open Thumb $\rightarrow$ *"Where is the nearest exit?"*
+   - `[1, 1, 1, 0]` + Closed Thumb $\rightarrow$ *"Water, please."* (Three Fingers)
+   - `[1, 1, 1, 0]` + Open Thumb $\rightarrow$ *"I am feeling hungry."*
    - `[0, 1, 1, 1]` $\rightarrow$ *"Okay, I understand."* (OK sign)
    - `[1, 0, 0, 1]` + Open Thumb $\rightarrow$ *"I love you."* (ILY sign)
+   - `[1, 0, 0, 1]` + Closed Thumb $\rightarrow$ *"No, thank you."* (Rock/Horns Sign)
+   - `[0, 0, 0, 1]` + Open Thumb $\rightarrow$ *"Please call or text me."* (Call Sign)
+   - `[0, 0, 0, 1]` + Closed Thumb $\rightarrow$ *"Where is the restroom?"* (Pinky Up)
 5. **1000ms Temporal Hold Barrier**: Enforces a 1-second hold duration to eliminate transition jitter and accidental gestures.
 6. **Voice Synthesis**: Emits JavaScript callback `onSignDetected` to Flutter, which triggers `flutter_tts` speech output.
 
@@ -251,7 +256,7 @@ Sai_Sahayak/
 │   ├── pyproject.toml            # Backend dependencies
 │   └── uv.lock                   # Pinned dependency lockfile
 │
-├── guide.md                      # Comprehensive Architecture & Viva Guide
+├── guide.md                      # Project Architecture & Technical Guide
 └── README.md                     # Project documentation
 ```
 
@@ -354,23 +359,7 @@ python tests/test_websockets_api.py
 
 ---
 
-## 7. Technical Viva Q&A Highlights
-
-#### Q1: Why prioritize Edge AI over a Cloud Architecture?
-> **Answer:** Assistive tools used outdoors, in public markets, or on transit cannot rely on constant internet connectivity. Cloud video streaming also creates latency (250–800ms) and exposes private camera feeds. Edge AI executes inference directly on-device in under 100ms with zero server cost, zero latency, and absolute user privacy.
-
-#### Q2: What is the difference between NCHW and NHWC tensor formats?
-> **Answer:** Standard image libraries decode images in **NHWC** (interleaved: $RGBRGB...$). However, convolutional layers in ONNX deep learning engines expect **NCHW** (planar: all $R$, then all $G$, then all $B$). NCHW enables vectorized SIMD memory operations across 2D feature maps. The app reshapes pixels into planar Float32 arrays before passing them to ONNX Runtime.
-
-#### Q3: Why is a 1000ms hold timer used in Sign AI?
-> **Answer:** Instantaneous frame-by-frame classification causes transition jitter and false positives as hands move through intermediate poses. The 1000ms hold threshold acts as a low-pass temporal filter ensuring only stable, intentional gestures trigger speech.
-
-#### Q4: How does the Blind Path Navigator estimate obstacle distance without LiDAR?
-> **Answer:** Using perspective projection principles: projected area on the camera sensor scales proportionally to $\frac{1}{\text{distance}^2}$. We compute $\text{AreaRatio} = \frac{w \times h}{\text{frameArea}}$. If this ratio exceeds 18% in the center corridor, an imminent collision warning is announced.
-
----
-
-## 8. Troubleshooting Guide
+## 7. Troubleshooting Guide
 
 | Issue | Cause | Solution |
 | :--- | :--- | :--- |
@@ -382,7 +371,7 @@ python tests/test_websockets_api.py
 
 ---
 
-## 9. Contributing & License
+## 8. Contributing & License
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue.
 
