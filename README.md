@@ -1,4 +1,4 @@
-# Sai Sahayak (साईं सहायक)
+# Sahayak (सहायक)
 ### Assistive Multi-Modal AI Suite for the Visually & Hearing Impaired
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-PresenceOP--Coder%2FSai__Sahayak-blue?logo=github)](https://github.com/PresenceOP-Coder/Sai_Sahayak)
