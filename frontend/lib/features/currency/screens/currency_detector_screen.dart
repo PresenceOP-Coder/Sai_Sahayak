@@ -23,6 +23,7 @@ class _CurrencyDetectorScreenState extends State<CurrencyDetectorScreen> {
   bool _isLoading = false;
   bool _isModelReady = false;
   bool _autoSpeak = true;
+  CameraDevice _cameraDevice = CameraDevice.rear;
   String _statusMessage = 'Initializing ONNX Runtime...';
 
   // Theme constants matching Sahayak design
@@ -90,6 +91,7 @@ class _CurrencyDetectorScreenState extends State<CurrencyDetectorScreen> {
     try {
       final XFile? file = await _picker.pickImage(
         source: source,
+        preferredCamera: _cameraDevice,
         maxWidth: 1920,
         maxHeight: 1920,
       );
@@ -147,6 +149,19 @@ class _CurrencyDetectorScreenState extends State<CurrencyDetectorScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.flip_camera_ios),
+            tooltip: _cameraDevice == CameraDevice.rear
+                ? 'Switch to front camera'
+                : 'Switch to back camera',
+            onPressed: () {
+              setState(() {
+                _cameraDevice = _cameraDevice == CameraDevice.rear
+                    ? CameraDevice.front
+                    : CameraDevice.rear;
+              });
+            },
+          ),
           IconButton(
             icon: Icon(_autoSpeak ? Icons.volume_up_rounded : Icons.volume_off_rounded),
             tooltip: _autoSpeak ? 'Mute Speech' : 'Enable Speech',

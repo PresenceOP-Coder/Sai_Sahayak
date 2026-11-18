@@ -480,6 +480,7 @@
 
     let detector = null;
     let stream = null;
+    let facingMode = "environment";
     let running = false;
     let lastFrameTime = 0;
     let lastSpoken = new Map();
@@ -626,6 +627,21 @@
       requestAnimationFrame(detectionLoop);
     }
 
+    async function switchCamera(mode) {
+      const wasRunning = running;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        video.srcObject = null;
+      }
+      facingMode = mode;
+      if (wasRunning) {
+        await start();
+      }
+    }
+
+    window.switchCamera = switchCamera;
+
     async function start() {
       startBtn.disabled = true;
       try {
@@ -635,7 +651,7 @@
         stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
           video: {
-            facingMode: "environment",
+            facingMode,
             width: { ideal: 640 },
             height: { ideal: 480 }
           }

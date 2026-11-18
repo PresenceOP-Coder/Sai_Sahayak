@@ -18,6 +18,8 @@ class _BlindPathNavigatorScreenState
     extends State<BlindPathNavigatorScreen> {
 
   final FlutterTts _flutterTts = FlutterTts();
+  InAppWebViewController? _navigatorWebViewController;
+  bool _useFrontCamera = false;
 
   final InAppLocalhostServer _localhostServer =
   InAppLocalhostServer(
@@ -184,6 +186,16 @@ class _BlindPathNavigatorScreenState
         ),
 
         actions: [
+          IconButton(
+            tooltip: _useFrontCamera ? 'Switch to back camera' : 'Switch to front camera',
+            icon: const Icon(Icons.flip_camera_ios),
+            onPressed: () async {
+              setState(() => _useFrontCamera = !_useFrontCamera);
+              await _navigatorWebViewController?.evaluateJavascript(
+                source: 'switchCamera(${_useFrontCamera ? '"user"' : '"environment"'})',
+              );
+            },
+          ),
           // Test Flutter TTS directly.
           IconButton(
             tooltip: 'Test voice',
@@ -271,6 +283,7 @@ class _BlindPathNavigatorScreenState
         ),
       )
           : InAppWebView(
+        key: ValueKey(_useFrontCamera),
         initialUrlRequest: URLRequest(
           url: WebUri(
             'http://localhost:8080/index2.html',
@@ -287,7 +300,7 @@ class _BlindPathNavigatorScreenState
 
         onWebViewCreated: (controller) {
           debugPrint('WebView created');
-
+          _navigatorWebViewController = controller;
           setupJavascriptHandlers(controller);
         },
 

@@ -14,6 +14,8 @@ class _SignToSpeechScreenState extends State<SignToSpeechScreen> {
   final FlutterTts _tts = FlutterTts();
   final ValueNotifier<String> _phraseNotifier = ValueNotifier("Waiting for sign...");
   final ValueNotifier<double> _progressNotifier = ValueNotifier(0.0);
+  InAppWebViewController? _webViewController;
+  bool _useFrontCamera = true;
 
   String? _lastSpoken;
   bool _hasPermission = false;
@@ -68,6 +70,18 @@ class _SignToSpeechScreenState extends State<SignToSpeechScreen> {
         title: const Text("Sign to Speech", style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF1E2158),
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            tooltip: _useFrontCamera ? 'Switch to back camera' : 'Switch to front camera',
+            icon: const Icon(Icons.flip_camera_ios),
+            onPressed: () async {
+              setState(() => _useFrontCamera = !_useFrontCamera);
+              await _webViewController?.evaluateJavascript(
+                source: 'switchCamera(${_useFrontCamera ? '"user"' : '"environment"'})',
+              );
+            },
+          ),
+        ],
       ),
       body: !_hasPermission
           ? Center(
@@ -103,6 +117,7 @@ class _SignToSpeechScreenState extends State<SignToSpeechScreen> {
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: InAppWebView(
+                      key: ValueKey(_useFrontCamera),
                       initialFile: "assets/index.html",
                       initialSettings: InAppWebViewSettings(
                         mediaPlaybackRequiresUserGesture: false,
@@ -116,6 +131,7 @@ class _SignToSpeechScreenState extends State<SignToSpeechScreen> {
                         );
                       },
                       onWebViewCreated: (controller) {
+                        _webViewController = controller;
                         controller.addJavaScriptHandler(
                           handlerName: 'onSignDetected',
                           callback: (args) {

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../sign/ui.dart';
 import '../../object/ui.dart';
 import '../../currency/screens/currency_detector_screen.dart';
 import '../../settings/screens/settings_screen.dart';
-import '../../auth/screens/login_screen.dart';
 
 class SahayakHome extends StatefulWidget {
   const SahayakHome({super.key});
@@ -156,8 +153,6 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    final String initial = (auth.email ?? 'G')[0].toUpperCase();
     final String greeting = _greeting();
 
     return Scaffold(
@@ -165,22 +160,8 @@ class _HomeTab extends StatelessWidget {
       body: Column(
         children: [
           _AppHeader(
-            initial: initial,
+            initial: 'G',
             greeting: greeting,
-            email: auth.email,
-            isLoggedIn: auth.isLoggedIn,
-            onLogout: () async {
-              await context.read<AuthProvider>().logout();
-              if (context.mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (r) => false,
-                );
-              }
-            },
-            onLogin: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-            ),
           ),
 
           Expanded(
@@ -284,18 +265,10 @@ class _AppHeader extends StatelessWidget {
   const _AppHeader({
     required this.initial,
     required this.greeting,
-    required this.email,
-    required this.isLoggedIn,
-    required this.onLogout,
-    required this.onLogin,
   });
 
   final String initial;
   final String greeting;
-  final String? email;
-  final bool isLoggedIn;
-  final VoidCallback onLogout;
-  final VoidCallback onLogin;
 
   static const primaryColor = Color(0xFF1E2158);
 
@@ -338,51 +311,17 @@ class _AppHeader extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-
-                  if (isLoggedIn)
-                    PopupMenuButton<String>(
-                      onSelected: (v) {
-                        if (v == 'logout') onLogout();
-                      },
-                      itemBuilder: (_) => [
-                        PopupMenuItem(
-                          value: 'email',
-                          enabled: false,
-                          child: Text(email ?? '',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600)),
-                        ),
-                        const PopupMenuDivider(),
-                        const PopupMenuItem(
-                          value: 'logout',
-                          child: Row(
-                            children: [
-                              Icon(Icons.logout, color: Colors.red, size: 18),
-                              SizedBox(width: 8),
-                              Text('Logout',
-                                  style: TextStyle(color: Colors.red)),
-                            ],
-                          ),
-                        ),
-                      ],
-                      child: CircleAvatar(
-                        radius: 18,
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        child: Text(
-                          initial,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15),
-                        ),
-                      ),
-                    )
-                  else
-                    TextButton(
-                      onPressed: onLogin,
-                      child: const Text('Login',
-                          style: TextStyle(color: Colors.white)),
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    child: Text(
+                      initial,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15),
                     ),
+                  ),
                 ],
               ),
 
